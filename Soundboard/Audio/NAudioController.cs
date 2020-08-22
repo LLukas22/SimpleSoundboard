@@ -13,11 +13,12 @@ namespace Soundboard.Audio
 		private readonly List<(AudioFileReader, AudioFileReader)> audiofiles =
 			new List<(AudioFileReader, AudioFileReader)>();
 
-		private (int OutputDevice1, int OutputDevice2) OutputDevices;
 		private readonly List<Thread> Threads = new List<Thread>();
-		public List<(Action<float>, Action<float>)> VolumeDelegates = new List<(Action<float>, Action<float>)>();
 		private readonly (VolumeSlider slider1, VolumeSlider slider2) volumesliders;
 		private readonly List<(WaveOutEvent, WaveOutEvent)> WaveoutEvents = new List<(WaveOutEvent, WaveOutEvent)>();
+
+		private (int OutputDevice1, int OutputDevice2) OutputDevices;
+		public List<(Action<float>, Action<float>)> VolumeDelegates = new List<(Action<float>, Action<float>)>();
 
 		public NAudioController(VolumeSlider slider1, VolumeSlider slider2)
 		{
@@ -40,14 +41,15 @@ namespace Soundboard.Audio
 					new WaveOutEvent {DeviceNumber = OutputDevices.OutputDevice2});
 				newTuppleWaveout.Item1.PlaybackStopped += OnPlaybackStopped;
 
-				var newTuppleAudioReader = (new AudioFileReader(InputFile.PathToFile), new AudioFileReader(InputFile.PathToFile));
+				var newTuppleAudioReader = (new AudioFileReader(InputFile.PathToFile),
+					new AudioFileReader(InputFile.PathToFile));
 				var File1 = newTuppleAudioReader.Item1;
 				Action<float> Volume1 = vol => File1.Volume = vol;
 				var File2 = newTuppleAudioReader.Item2;
 				Action<float> Volume2 = vol => File2.Volume = vol;
 				var newTuppleVolumeDelgate = (Volume1, Volume2);
-				newTuppleVolumeDelgate.Volume1?.Invoke(volumesliders.slider1.Volume*InputFile.Volume);
-				newTuppleVolumeDelgate.Volume2?.Invoke(volumesliders.slider2.Volume*InputFile.Volume);
+				newTuppleVolumeDelgate.Volume1?.Invoke(volumesliders.slider1.Volume * InputFile.Volume);
+				newTuppleVolumeDelgate.Volume2?.Invoke(volumesliders.slider2.Volume * InputFile.Volume);
 				newTuppleWaveout.Item1.Init(newTuppleAudioReader.Item1);
 				newTuppleWaveout.Item2.Init(newTuppleAudioReader.Item2);
 				newTuppleWaveout.Item1.Play();

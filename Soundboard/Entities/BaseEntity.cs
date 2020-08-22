@@ -7,8 +7,7 @@ namespace Soundboard.Entities
 {
 	public class BaseEntity : INotifyPropertyChanged, IBaseEntity
 	{
-		[JsonIgnore]
-		public bool IsDirty;
+		[JsonIgnore] public bool IsDirty;
 
 		public event PropertyChangedEventHandler PropertyChanged;
 

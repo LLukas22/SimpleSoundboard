@@ -9,13 +9,13 @@ namespace Soundboard.Presenters
 {
 	public class EditPresenter : BasePresenter
 	{
-		private AudioFileEntity audioFileEntity;
 		private readonly EditView editView;
+		private AudioFileEntity audioFileEntity;
 
 		public EditPresenter(KeyboardController keyboardController, SettingsEntity settingsEntity, MainView mainView) :
 			base(keyboardController, settingsEntity, mainView)
 		{
-			editView = new EditView(this,keyboardController);
+			editView = new EditView(this, keyboardController);
 		}
 
 		public override void BindData(object entity)
@@ -68,14 +68,18 @@ namespace Soundboard.Presenters
 				var index = Globals.entityList.IndexOf(audioFileEntity);
 				Globals.entityList[index].KeyBinding = editView.KeysTuple;
 				Globals.entityList[index].PathToFile = editView.filepath;
-				Globals.entityList[index].KeyboardName = editView.useDefaultKeyboard ? Globals.DefaultKeyboard : editView.keyboardHash ?? Globals.DefaultKeyboard;
+				Globals.entityList[index].KeyboardName = editView.useDefaultKeyboard
+					? Globals.DefaultKeyboard
+					: editView.keyboardHash ?? Globals.DefaultKeyboard;
 				Globals.entityList[index].Volume = editView.volume;
 			}
 			else
 			{
 				audioFileEntity.PathToFile = editView.filepath;
 				audioFileEntity.KeyBinding = editView.KeysTuple;
-				audioFileEntity.KeyboardName = editView.useDefaultKeyboard ? Globals.DefaultKeyboard : editView.keyboardHash ?? Globals.DefaultKeyboard;
+				audioFileEntity.KeyboardName = editView.useDefaultKeyboard
+					? Globals.DefaultKeyboard
+					: editView.keyboardHash ?? Globals.DefaultKeyboard;
 				audioFileEntity.Volume = editView.volume;
 				Globals.entityList.Add(audioFileEntity);
 			}

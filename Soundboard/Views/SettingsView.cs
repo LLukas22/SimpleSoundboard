@@ -8,10 +8,9 @@ namespace Soundboard
 {
 	public partial class SettingsView : BaseView
 	{
-		
-		public MetroColorStyle metroColorStyle;
-
 		private readonly SettingsPresenter settingsPresenter;
+
+		public MetroColorStyle metroColorStyle;
 		public (Keys Key1, Keys Key2) StopKeys;
 
 		public SettingsView(SettingsPresenter settingsPresenter)

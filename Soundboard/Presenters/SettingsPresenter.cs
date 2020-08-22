@@ -1,6 +1,5 @@
 ﻿using System.Windows.Forms;
 using MetroFramework;
-using Microsoft.Win32;
 using Soundboard.Entities;
 using Soundboard.Extensions;
 using Soundboard.Keyboard;
@@ -48,6 +47,5 @@ namespace Soundboard.Presenters
 				settingsView.Close();
 			}
 		}
-
 	}
 }

@@ -4,33 +4,33 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.InteropServices;
-using System.Windows.Input;
 
 namespace Soundboard.RawInput
 {
 	public sealed class RawKeyboard
 	{
-		private readonly Dictionary<IntPtr,KeyPressEvent> _deviceList = new Dictionary<IntPtr,KeyPressEvent>();
 		public delegate void DeviceEventHandler(object sender, RawInputEventArg e);
-		public event DeviceEventHandler KeyPressed;
-		readonly object _padLock = new object();
-		public int NumberOfKeyboards { get; private set; }
-		static InputData _rawBuffer;
+
+		private static InputData _rawBuffer;
+		private readonly Dictionary<IntPtr, KeyPressEvent> _deviceList = new Dictionary<IntPtr, KeyPressEvent>();
+		private readonly object _padLock = new object();
 
 		public RawKeyboard(IntPtr hwnd, bool captureOnlyInForeground)
 		{
 			var rid = new RawInputDevice[1];
 
-			rid[0].UsagePage = HidUsagePage.GENERIC;       
-			rid[0].Usage = HidUsage.Keyboard;              
-            rid[0].Flags = (captureOnlyInForeground ? RawInputDeviceFlags.NONE : RawInputDeviceFlags.INPUTSINK) | RawInputDeviceFlags.DEVNOTIFY;
+			rid[0].UsagePage = HidUsagePage.GENERIC;
+			rid[0].Usage = HidUsage.Keyboard;
+			rid[0].Flags = (captureOnlyInForeground ? RawInputDeviceFlags.NONE : RawInputDeviceFlags.INPUTSINK) |
+			               RawInputDeviceFlags.DEVNOTIFY;
 			rid[0].Target = hwnd;
 
-			if(!Win32.RegisterRawInputDevices(rid, (uint)rid.Length, (uint)Marshal.SizeOf(rid[0])))
-			{
+			if (!Win32.RegisterRawInputDevices(rid, (uint) rid.Length, (uint) Marshal.SizeOf(rid[0])))
 				throw new ApplicationException("Failed to register raw input device(s).");
-			}
 		}
+
+		public int NumberOfKeyboards { get; private set; }
+		public event DeviceEventHandler KeyPressed;
 
 		public void EnumerateDevices()
 		{
@@ -45,37 +45,41 @@ namespace Soundboard.RawInput
 					DeviceName = "Global Keyboard",
 					DeviceHandle = IntPtr.Zero,
 					DeviceType = Win32.GetDeviceType(DeviceType.RimTypekeyboard),
-					Name = "Fake Keyboard. Some keys (ZOOM, MUTE, VOLUMEUP, VOLUMEDOWN) are sent to rawinput with a handle of zero.",
+					Name =
+						"Fake Keyboard. Some keys (ZOOM, MUTE, VOLUMEUP, VOLUMEDOWN) are sent to rawinput with a handle of zero.",
 					Source = keyboardNumber++.ToString(CultureInfo.InvariantCulture)
 				};
 
 				_deviceList.Add(globalDevice.DeviceHandle, globalDevice);
-				
+
 				var numberOfDevices = 0;
 				uint deviceCount = 0;
-				var dwSize = (Marshal.SizeOf(typeof(Rawinputdevicelist)));
+				var dwSize = Marshal.SizeOf(typeof(Rawinputdevicelist));
 
-				if (Win32.GetRawInputDeviceList(IntPtr.Zero, ref deviceCount, (uint)dwSize) == 0)
+				if (Win32.GetRawInputDeviceList(IntPtr.Zero, ref deviceCount, (uint) dwSize) == 0)
 				{
-					var pRawInputDeviceList = Marshal.AllocHGlobal((int)(dwSize * deviceCount));
-					Win32.GetRawInputDeviceList(pRawInputDeviceList, ref deviceCount, (uint)dwSize);
+					var pRawInputDeviceList = Marshal.AllocHGlobal((int) (dwSize * deviceCount));
+					Win32.GetRawInputDeviceList(pRawInputDeviceList, ref deviceCount, (uint) dwSize);
 
 					for (var i = 0; i < deviceCount; i++)
 					{
 						uint pcbSize = 0;
 
 						// On Window 8 64bit when compiling against .Net > 3.5 using .ToInt32 you will generate an arithmetic overflow. Leave as it is for 32bit/64bit applications
-						var rid = (Rawinputdevicelist)Marshal.PtrToStructure(new IntPtr((pRawInputDeviceList.ToInt64() + (dwSize * i))), typeof(Rawinputdevicelist));
+						var rid = (Rawinputdevicelist) Marshal.PtrToStructure(
+							new IntPtr(pRawInputDeviceList.ToInt64() + dwSize * i), typeof(Rawinputdevicelist));
 
-						Win32.GetRawInputDeviceInfo(rid.hDevice, RawInputDeviceInfo.RIDI_DEVICENAME, IntPtr.Zero, ref pcbSize);
+						Win32.GetRawInputDeviceInfo(rid.hDevice, RawInputDeviceInfo.RIDI_DEVICENAME, IntPtr.Zero,
+							ref pcbSize);
 
 						if (pcbSize <= 0) continue;
 
-						var pData = Marshal.AllocHGlobal((int)pcbSize);
-						Win32.GetRawInputDeviceInfo(rid.hDevice, RawInputDeviceInfo.RIDI_DEVICENAME, pData, ref pcbSize);
+						var pData = Marshal.AllocHGlobal((int) pcbSize);
+						Win32.GetRawInputDeviceInfo(rid.hDevice, RawInputDeviceInfo.RIDI_DEVICENAME, pData,
+							ref pcbSize);
 						var deviceName = Marshal.PtrToStringAnsi(pData);
 
-                        if (rid.dwType == DeviceType.RimTypekeyboard || rid.dwType == DeviceType.RimTypeHid)
+						if (rid.dwType == DeviceType.RimTypekeyboard || rid.dwType == DeviceType.RimTypeHid)
 						{
 							var deviceDesc = Win32.GetDeviceDescription(deviceName);
 
@@ -87,7 +91,7 @@ namespace Soundboard.RawInput
 								Name = deviceDesc,
 								Source = keyboardNumber++.ToString(CultureInfo.InvariantCulture)
 							};
-						   
+
 							if (!_deviceList.ContainsKey(rid.hDevice))
 							{
 								numberOfDevices++;
@@ -105,10 +109,10 @@ namespace Soundboard.RawInput
 					return;
 				}
 			}
-			
+
 			throw new Win32Exception(Marshal.GetLastWin32Error());
 		}
-	   
+
 		public void ProcessRawInput(IntPtr hdevice)
 		{
 			//Debug.WriteLine(_rawBuffer.data.keyboard.ToString());
@@ -118,9 +122,11 @@ namespace Soundboard.RawInput
 			if (_deviceList.Count == 0) return;
 
 			var dwSize = 0;
-			Win32.GetRawInputData(hdevice, DataCommand.RID_INPUT, IntPtr.Zero, ref dwSize, Marshal.SizeOf(typeof(Rawinputheader)));
+			Win32.GetRawInputData(hdevice, DataCommand.RID_INPUT, IntPtr.Zero, ref dwSize,
+				Marshal.SizeOf(typeof(Rawinputheader)));
 
-			if (dwSize != Win32.GetRawInputData(hdevice, DataCommand.RID_INPUT, out _rawBuffer, ref dwSize, Marshal.SizeOf(typeof (Rawinputheader))))
+			if (dwSize != Win32.GetRawInputData(hdevice, DataCommand.RID_INPUT, out _rawBuffer, ref dwSize,
+				Marshal.SizeOf(typeof(Rawinputheader))))
 			{
 				Debug.WriteLine("Error getting the rawinput buffer");
 				return;
@@ -130,9 +136,9 @@ namespace Soundboard.RawInput
 			int makeCode = _rawBuffer.data.keyboard.Makecode;
 			int flags = _rawBuffer.data.keyboard.Flags;
 
-			if (virtualKey == Win32.KEYBOARD_OVERRUN_MAKE_CODE) return; 
-			
-			var isE0BitSet = ((flags & Win32.RI_KEY_E0) != 0);
+			if (virtualKey == Win32.KEYBOARD_OVERRUN_MAKE_CODE) return;
+
+			var isE0BitSet = (flags & Win32.RI_KEY_E0) != 0;
 
 			KeyPressEvent keyPressEvent;
 
@@ -149,17 +155,15 @@ namespace Soundboard.RawInput
 				return;
 			}
 
-			var isBreakBitSet = ((flags & Win32.RI_KEY_BREAK) != 0);
-			
-			keyPressEvent.KeyState = isBreakBitSet ? KeyState.Released : KeyState.Pressed; 
+			var isBreakBitSet = (flags & Win32.RI_KEY_BREAK) != 0;
+
+			keyPressEvent.KeyState = isBreakBitSet ? KeyState.Released : KeyState.Pressed;
 			keyPressEvent.Message = _rawBuffer.data.keyboard.Message;
-			keyPressEvent.VKeyName = KeyMapper.GetKeyName(VirtualKeyCorrection(virtualKey, isE0BitSet, makeCode)).ToUpper();
+			keyPressEvent.VKeyName =
+				KeyMapper.GetKeyName(VirtualKeyCorrection(virtualKey, isE0BitSet, makeCode)).ToUpper();
 			keyPressEvent.VKey = virtualKey;
-		   
-			if (KeyPressed != null)
-			{
-				KeyPressed(this, new RawInputEventArg(keyPressEvent));
-			}
+
+			if (KeyPressed != null) KeyPressed(this, new RawInputEventArg(keyPressEvent));
 		}
 
 		private static int VirtualKeyCorrection(int virtualKey, bool isE0BitSet, int makeCode)
@@ -169,10 +173,7 @@ namespace Soundboard.RawInput
 			if (_rawBuffer.header.hDevice == IntPtr.Zero)
 			{
 				// When hDevice is 0 and the vkey is VK_CONTROL indicates the ZOOM key
-				if (_rawBuffer.data.keyboard.VKey == Win32.VK_CONTROL)
-				{
-					correctedVKey = Win32.VK_ZOOM;
-				}
+				if (_rawBuffer.data.keyboard.VKey == Win32.VK_CONTROL) correctedVKey = Win32.VK_ZOOM;
 			}
 			else
 			{

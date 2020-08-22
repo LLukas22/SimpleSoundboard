@@ -95,7 +95,7 @@
     <Compile Include="Extensions\StyleExtension.cs" />
     <Compile Include="Interfaces\IBaseView.cs" />
     <Compile Include="Interfaces\IEditView.cs" />
-    <Compile Include="Jason\JasonController.cs" />
+    <Compile Include="Json\JsonController.cs" />
     <Compile Include="Keyboard\KeyboardController.cs" />
     <Compile Include="Presenters\BasePresenter.cs" />
     <Compile Include="Interfaces\IBasePresenter.cs" />

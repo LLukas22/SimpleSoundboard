@@ -6,9 +6,9 @@ namespace Soundboard.Entities
 	{
 		private (Keys FirstKey, Keys SecondKey, Keys ThirdKey) keyBinding;
 
-		private string pathToFile;
-
 		private string keyboardName;
+
+		private string pathToFile;
 
 		private float volume = 1;
 
@@ -16,7 +16,8 @@ namespace Soundboard.Entities
 		{
 		}
 
-		public AudioFileEntity(string pathToFile, (Keys FirstKey, Keys SecondKey, Keys ThirdKey) keyBinding,float volume = 1,string keyboardName = null)
+		public AudioFileEntity(string pathToFile, (Keys FirstKey, Keys SecondKey, Keys ThirdKey) keyBinding,
+			float volume = 1, string keyboardName = null)
 		{
 			this.pathToFile = pathToFile;
 			this.keyBinding = keyBinding;
@@ -36,9 +37,9 @@ namespace Soundboard.Entities
 				}
 			}
 		}
+
 		public string KeyboardName
 		{
-
 			get => keyboardName;
 			set
 			{
@@ -49,6 +50,7 @@ namespace Soundboard.Entities
 				}
 			}
 		}
+
 		public string PathToFile
 		{
 			get => pathToFile;

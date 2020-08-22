@@ -9,32 +9,29 @@ using NAudio.Wave;
 using Soundboard.Audio;
 using Soundboard.Entities;
 using Soundboard.Extensions;
-using Soundboard.Jason;
+using Soundboard.Json;
 using Soundboard.Keyboard;
 using Soundboard.Presenters;
 using Soundboard.Properties;
 using Soundboard.Views;
-
-
 
 namespace Soundboard
 {
 	public partial class MainView : BaseView
 	{
 		private readonly string AudioEntityListPath = @"AudioEntityList.json";
-		private readonly string SettingsEntityPath = @"SettingsEntity.json";
 		private readonly JasonController jasonController;
 		private readonly KeyboardController keyboardController;
-		public NAudioController nAudioController;
 		private readonly NotifyIcon notifyIcon = new NotifyIcon();
+		private readonly string SettingsEntityPath = @"SettingsEntity.json";
+		public NAudioController nAudioController;
 		private int Outputdevice1;
 		private int Outputdevice2;
+		private readonly RawInput.RawInput rawInput;
 		public SettingsEntity settingsEntity;
-		private RawInput.RawInput rawInput;
 
 		public MainView()
 		{
-			
 			InitializeComponent();
 			Resize += MainView_Resize;
 			notifyIcon.DoubleClick += NotifyIcon_DoubleClick;
@@ -42,7 +39,7 @@ namespace Soundboard
 
 			nAudioController = new NAudioController(VolumeSlider, VolumeSlider2);
 
-			rawInput = new RawInput.RawInput(this.Handle, false);
+			rawInput = new RawInput.RawInput(Handle, false);
 
 			keyboardController = new KeyboardController(nAudioController, rawInput);
 
@@ -52,7 +49,7 @@ namespace Soundboard
 			settingsEntity = jasonController.LoadSettingsEntity();
 
 			Stop.Text = "STOP\n" + CleanUpButtonName(settingsEntity.StopKeys.StopKey1,
-				            settingsEntity.StopKeys.StopKey2);
+				settingsEntity.StopKeys.StopKey2);
 			VolumeSlider.Volume = settingsEntity.Volumes.Volume1;
 			VolumeSlider2.Volume = settingsEntity.Volumes.Volume2;
 			VolumeSlider.BackColor = Color.Transparent;
@@ -73,7 +70,7 @@ namespace Soundboard
 			metroComboBox2.Text = metroComboBox2.Items[Outputdevice2 + 1].ToString();
 
 			Globals.styleManager.Style = settingsEntity.MetroColorStyle;
-			Globals.styleManager.Theme = MetroFramework.MetroThemeStyle.Dark;
+			Globals.styleManager.Theme = MetroThemeStyle.Dark;
 			Globals.styleManager.Clone(this);
 			VolumeSlider.TextBrush = new SolidBrush(Color.AntiqueWhite);
 			VolumeSlider2.TextBrush = new SolidBrush(Color.AntiqueWhite);
@@ -125,12 +122,9 @@ namespace Soundboard
 
 			grid.Rows.Clear();
 			foreach (var entity in Globals.entityList)
-			{
 				grid.Rows.Add(Path.GetFileNameWithoutExtension(entity.PathToFile), CleanUpButtonName(
 					entity.KeyBinding.FirstKey, entity.KeyBinding.SecondKey,
 					entity.KeyBinding.ThirdKey), entity.Volume);
-			}
-			
 		}
 
 		private string CleanUpButtonName(Keys k1, Keys k2, Keys k3 = Keys.None)
@@ -200,22 +194,25 @@ namespace Soundboard
 
 		private void grid_DoubleClick(object sender, EventArgs e)
 		{
-			
 			if (grid.SelectedRows.Count > 0 && grid.SelectedRows[0].Index < Globals.entityList.Count)
 			{
 				var editPresenter = new EditPresenter(keyboardController, settingsEntity, this);
 				editPresenter.BindData(Globals.entityList.ElementAt(grid.SelectedRows[0].Index));
 				editPresenter.Show();
 			}
-		
 		}
 
 		public override void Save()
 		{
 			RefreshEntities();
-			settingsEntity.OutputDevices =(Outputdevice1, Outputdevice2);
+			settingsEntity.OutputDevices = (Outputdevice1, Outputdevice2);
 			jasonController.Save(Globals.entityList, settingsEntity);
 			base.Save();
+		}
+
+		private void MainView_FormClosing(object sender, FormClosingEventArgs e)
+		{
+			Save();
 		}
 
 		#region Buttons
@@ -223,11 +220,7 @@ namespace Soundboard
 		private void btnPlay_Click(object sender, EventArgs e)
 		{
 			if (grid.SelectedRows.Count > 0 && grid.SelectedRows[0].Index < Globals.entityList.Count)
-			{
 				nAudioController.StartPlayback(Globals.entityList.ElementAt(grid.SelectedRows[0].Index));
-			} 
-			
-			
 		}
 
 		private void Stop_Click_1(object sender, EventArgs e)
@@ -247,7 +240,7 @@ namespace Soundboard
 			var settingsPresenter = new SettingsPresenter(keyboardController, settingsEntity, this);
 			settingsPresenter.Show();
 			Stop.Text = "STOP\n" + CleanUpButtonName(settingsEntity.StopKeys.StopKey1,
-				            settingsEntity.StopKeys.StopKey2);
+				settingsEntity.StopKeys.StopKey2);
 		}
 
 		private void SaveButton_Click(object sender, EventArgs e)
@@ -260,9 +253,7 @@ namespace Soundboard
 		private void btnDelete_Click(object sender, EventArgs e)
 		{
 			if (grid.SelectedRows.Count > 0 && grid.SelectedRows[0].Index < Globals.entityList.Count)
-			{
 				Globals.entityList.RemoveAt(grid.SelectedRows[0].Index);
-			}
 			RefreshGrid();
 			keyboardController.Refresh(settingsEntity);
 		}
@@ -273,12 +264,6 @@ namespace Soundboard
 			debugForm.Show(this);
 		}
 
-
 		#endregion Buttons
-
-		private void MainView_FormClosing(object sender, FormClosingEventArgs e)
-		{
-			Save();
-		}
 	}
 }

@@ -5,31 +5,32 @@ using MetroFramework;
 using Newtonsoft.Json;
 using Soundboard.Entities;
 
-
-namespace Soundboard.Jason
+namespace Soundboard.Json
 {
 	public class JasonController
 	{
-		
+		private readonly JsonSerializerSettings jsonSettings;
+
 		private readonly string PathToAudioEntityList;
 		private readonly string PathToSettingsEntity;
-		private readonly JsonSerializerSettings jsonSettings;
 
 		public JasonController(string PathToAudioEntityList, string PathToSettingsEntity)
 		{
 			this.PathToAudioEntityList = PathToAudioEntityList;
 			this.PathToSettingsEntity = PathToSettingsEntity;
-			jsonSettings = new JsonSerializerSettings()
+			jsonSettings = new JsonSerializerSettings
 			{
-				NullValueHandling = NullValueHandling.Ignore,
+				NullValueHandling = NullValueHandling.Ignore
 			};
 		}
 
 		public void Save(IList<AudioFileEntity> audioEntityList, SettingsEntity settingsEntity)
 		{
-			File.WriteAllText(PathToAudioEntityList, JsonConvert.SerializeObject(audioEntityList, Formatting.Indented, jsonSettings));
+			File.WriteAllText(PathToAudioEntityList,
+				JsonConvert.SerializeObject(audioEntityList, Formatting.Indented, jsonSettings));
 
-			File.WriteAllText(PathToSettingsEntity, JsonConvert.SerializeObject(settingsEntity, Formatting.Indented, jsonSettings));
+			File.WriteAllText(PathToSettingsEntity,
+				JsonConvert.SerializeObject(settingsEntity, Formatting.Indented, jsonSettings));
 		}
 
 		public IList<AudioFileEntity> LoadAudioEntityList()
@@ -47,13 +48,11 @@ namespace Soundboard.Jason
 		public SettingsEntity LoadSettingsEntity()
 		{
 			if (File.Exists(PathToSettingsEntity))
-			{
 				using (var reader = new StreamReader(PathToSettingsEntity))
 				{
 					var json = reader.ReadToEnd();
 					return JsonConvert.DeserializeObject<SettingsEntity>(json, jsonSettings);
 				}
-			}
 
 			var entity = new SettingsEntity();
 			entity.Volumes = (0.5f, 0.5f);
@@ -63,6 +62,5 @@ namespace Soundboard.Jason
 			entity.Inputdevice = 0;
 			return entity;
 		}
-
 	}
 }

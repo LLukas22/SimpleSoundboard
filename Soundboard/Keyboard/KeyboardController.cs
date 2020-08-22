@@ -9,23 +9,25 @@ namespace Soundboard.Keyboard
 {
 	public class KeyboardController
 	{
-		private int actualStopKeyCount;
+		private readonly Dictionary<string, Dictionary<(Keys, Keys, Keys), AudioFileEntity>> audioFiles =
+			new Dictionary<string, Dictionary<(Keys, Keys, Keys), AudioFileEntity>>();
 
-		private readonly Dictionary<string, Dictionary<(Keys, Keys, Keys), AudioFileEntity>> audioFiles = new Dictionary<string, Dictionary<(Keys, Keys, Keys), AudioFileEntity>>();
+		private readonly IDictionary<Keys, AudioFileEntity>
+			lastPathDictionary = new Dictionary<Keys, AudioFileEntity>();
 
-		private readonly IDictionary<Keys, AudioFileEntity> lastPathDictionary = new Dictionary<Keys, AudioFileEntity>();
-		private string lastKeyboard = string.Empty;
 		private readonly NAudioController nAudioController;
-		public readonly RawInput.RawInput RawInput;
 
 		private readonly IList<Keys> pressedKeysList = new List<Keys>();
+		public readonly RawInput.RawInput RawInput;
 		private readonly IDictionary<Keys, Keys> StopDictionary = new Dictionary<Keys, Keys>();
 		private readonly IList<Keys> supressedKeys = new List<Keys>();
+		private int actualStopKeyCount;
+		private string lastKeyboard = string.Empty;
 
 		public KeyboardController(NAudioController nAudioController, RawInput.RawInput rawInput)
 		{
 			this.nAudioController = nAudioController;
-			this.RawInput = rawInput;
+			RawInput = rawInput;
 		}
 
 		private void RawInputOnKeyPressed(object sender, RawInputEventArg e)
@@ -44,7 +46,6 @@ namespace Soundboard.Keyboard
 		public void Subscribe()
 		{
 			RawInput.KeyPressed += RawInputOnKeyPressed;
-			
 		}
 
 		public void Unsubscribe()
@@ -79,16 +80,12 @@ namespace Soundboard.Keyboard
 
 			var activeKeyboardAudioFiles = new Dictionary<(Keys, Keys, Keys), AudioFileEntity>();
 			if (audioFiles.ContainsKey(args.Hash))
-			{
-				foreach(var entry in audioFiles[args.Hash])
-					activeKeyboardAudioFiles.Add(entry.Key,entry.Value);
-			}
+				foreach (var entry in audioFiles[args.Hash])
+					activeKeyboardAudioFiles.Add(entry.Key, entry.Value);
 			if (audioFiles.ContainsKey(Globals.DefaultKeyboard))
-			{
 				foreach (var entry in audioFiles[Globals.DefaultKeyboard])
 					activeKeyboardAudioFiles.Add(entry.Key, entry.Value);
-			}
-			
+
 			switch (pressedKeysList.Count)
 			{
 				case 1:
@@ -104,6 +101,7 @@ namespace Soundboard.Keyboard
 					pressedKeysList.Clear();
 					break;
 			}
+
 			removeKeyFromPressedList(args.KeyCode);
 		}
 
@@ -123,12 +121,11 @@ namespace Soundboard.Keyboard
 			foreach (var entity in Globals.entityList)
 			{
 				if (!audioFiles.ContainsKey(entity.KeyboardName ?? Globals.DefaultKeyboard))
-					audioFiles.Add(entity.KeyboardName ?? Globals.DefaultKeyboard, new Dictionary<(Keys, Keys, Keys), AudioFileEntity>());
+					audioFiles.Add(entity.KeyboardName ?? Globals.DefaultKeyboard,
+						new Dictionary<(Keys, Keys, Keys), AudioFileEntity>());
 
 				if (!audioFiles[entity.KeyboardName ?? Globals.DefaultKeyboard].ContainsKey(entity.KeyBinding))
-				{
 					audioFiles[entity.KeyboardName ?? Globals.DefaultKeyboard].Add(entity.KeyBinding, entity);
-				}
 			}
 		}
 
@@ -159,7 +156,8 @@ namespace Soundboard.Keyboard
 			return false;
 		}
 
-		private void MatchOneKey(RawInputEventArg args, Dictionary<(Keys, Keys, Keys), AudioFileEntity> audioFileDictionary)
+		private void MatchOneKey(RawInputEventArg args,
+			Dictionary<(Keys, Keys, Keys), AudioFileEntity> audioFileDictionary)
 		{
 			var key = args.KeyCode;
 			if (audioFileDictionary.Keys.Any(x => x == (key, Keys.None, Keys.None)))
@@ -179,7 +177,8 @@ namespace Soundboard.Keyboard
 			}
 		}
 
-		private void MatchTwoKeys(RawInputEventArg args, Dictionary<(Keys, Keys, Keys), AudioFileEntity> audioFileDictionary)
+		private void MatchTwoKeys(RawInputEventArg args,
+			Dictionary<(Keys, Keys, Keys), AudioFileEntity> audioFileDictionary)
 		{
 			var key = args.KeyCode;
 			if (audioFileDictionary.Keys.Any(x => x == (pressedKeysList[0], key, Keys.None)))
@@ -201,7 +200,8 @@ namespace Soundboard.Keyboard
 			}
 		}
 
-		private void MatchThreeKeys(RawInputEventArg args, Dictionary<(Keys, Keys, Keys), AudioFileEntity> audioFileDictionary)
+		private void MatchThreeKeys(RawInputEventArg args,
+			Dictionary<(Keys, Keys, Keys), AudioFileEntity> audioFileDictionary)
 		{
 			var key = args.KeyCode;
 			if (audioFileDictionary.Keys.Any(x => x == (pressedKeysList[0], pressedKeysList[1], key)))
