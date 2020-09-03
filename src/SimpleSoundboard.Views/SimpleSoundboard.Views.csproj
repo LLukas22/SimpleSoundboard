@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk" InitialTargets="UpdateViews">
+
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>net5.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MetroModernUI" Version="1.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Base\" />
+    <Folder Include="Controls\" />
+  </ItemGroup>
+
+  <Target Name="UpdateViews">
+    <Exec Command="powershell.exe -NonInteractive -ExecutionPolicy Unrestricted -Command &quot; &amp; { ..\SimpleSoundboard.Views.Designer\CopyViews.ps1 } &quot;" LogStandardErrorAsError="True" ContinueOnError="False" WorkingDirectory="..\SimpleSoundboard.Views.Designer" />
+  </Target>
+
+</Project>
