@@ -1,7 +1,10 @@
 
 using System;
 using System.Windows.Forms;
+using SimpleSoundboard.Interfaces.Models;
+using SimpleSoundboard.Root;
 using SimpleSoundboard.Views.Views;
+using Unity;
 
 namespace SimpleSoundboard
 {
@@ -13,6 +16,13 @@ namespace SimpleSoundboard
 		[STAThread]
 		static void Main()
 		{
+			var container = new UnityContainer();
+			container.RegisterInstance(container);
+
+			new Registration(container).Register().Initialize();
+
+			var repositoryManager = container.Resolve<IRepositoryManager>();
+			repositoryManager.Save();
 			Application.SetHighDpiMode(HighDpiMode.SystemAware);
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
