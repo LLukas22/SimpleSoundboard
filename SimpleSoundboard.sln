@@ -11,7 +11,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleSoundboard.Views.Desi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleSoundboard.Interfaces", "src\SimpleSoundboard.Interfaces\SimpleSoundboard.Interfaces.csproj", "{0FB7E6B7-1B2D-4969-895F-6D27D3284E6B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleSoundboard.Controler", "src\SimpleSoundboard.Controler\SimpleSoundboard.Controler.csproj", "{E72C5945-8CE6-4F09-951E-90989B14537A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleSoundboard.Controller", "src\SimpleSoundboard.Controler\SimpleSoundboard.Controller.csproj", "{E72C5945-8CE6-4F09-951E-90989B14537A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleSoundboard.Models", "src\SimpleSoundboard.Models\SimpleSoundboard.Models.csproj", "{25352734-FC63-49DB-B824-BC6126265060}"
 EndProject
@@ -19,7 +19,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleSoundboard.NAudio", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleSoundboard.Keyboard", "src\SimpleSoundboard.Keyboard\SimpleSoundboard.Keyboard.csproj", "{1922A66B-94B4-4A66-807F-82E4E494A4E2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleSoundboard.NameService", "src\SimpleSoundboard.NameService\SimpleSoundboard.NameService.csproj", "{A3273538-B706-4939-9CBC-F1B6BE1D023D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleSoundboard.NameService", "src\SimpleSoundboard.NameService\SimpleSoundboard.NameService.csproj", "{A3273538-B706-4939-9CBC-F1B6BE1D023D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

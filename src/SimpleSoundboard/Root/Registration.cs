@@ -19,6 +19,8 @@ namespace SimpleSoundboard.Root
 		public override IRegistration Initialize()
 		{
 			new ModelRegistration(container).Register().Initialize();
+			new ViewRegistration(container).Register().Initialize();
+			new ControllerRegistration(container).Register().Initialize();
 			return base.Initialize();
 		}
 	}

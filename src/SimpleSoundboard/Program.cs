@@ -1,6 +1,9 @@
 
 using System;
 using System.Windows.Forms;
+using MetroFramework;
+using MetroFramework.Components;
+using SimpleSoundboard.Controller;
 using SimpleSoundboard.Interfaces.Models;
 using SimpleSoundboard.Root;
 using SimpleSoundboard.Views.Views;
@@ -23,10 +26,10 @@ namespace SimpleSoundboard
 
 			var repositoryManager = container.Resolve<IRepositoryManager>();
 			repositoryManager.Save();
-			Application.SetHighDpiMode(HighDpiMode.SystemAware);
+			Application.SetHighDpiMode(HighDpiMode.PerMonitorV2);
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
-			Application.Run(new MainView());
+			Application.Run(container.Resolve<IMainController>().SpecificView as Form);
 		}
 	}
 }

@@ -1,7 +1,10 @@
 ﻿
 using System;
 using System.IO;
+using MetroFramework;
+using MetroFramework.Components;
 using SimpleSoundboard.Interfaces.Models;
+using SimpleSoundboard.Interfaces.Models.Repositories;
 using SimpleSoundboard.Interfaces.Models.StorageManager;
 using SimpleSoundboard.Interfaces.Root.Base;
 using SimpleSoundboard.Models;
@@ -56,6 +59,12 @@ namespace SimpleSoundboard.Root.Registrations
 			container.Resolve<IAudioEntryRepository>();
 			container.Resolve<IApplicationSettingsRepository>();
 			container.Resolve<IRepositoryManager>().Load();
+
+			//TODO get Style from Settings
+			var styleManager = new MetroStyleManager();
+			styleManager.Theme = MetroThemeStyle.Dark;
+			container.RegisterInstance(styleManager);
+
 			return base.Initialize();
 		}
 	}

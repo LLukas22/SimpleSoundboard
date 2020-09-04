@@ -1,7 +1,7 @@
 ﻿using SimpleSoundboard.Interfaces.Models.Base;
 using SimpleSoundboard.Interfaces.Models.Models;
 
-namespace SimpleSoundboard.Models.Repositories
+namespace SimpleSoundboard.Interfaces.Models.Repositories
 {
 	public interface IApplicationSettingsRepository : IRepository<IApplicationSettingsModel>
 	{
