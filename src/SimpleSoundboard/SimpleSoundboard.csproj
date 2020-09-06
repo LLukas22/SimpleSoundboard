@@ -14,8 +14,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SimpleSoundboard.Controler\SimpleSoundboard.Controller.csproj" />
+    <ProjectReference Include="..\SimpleSoundboard.Extensions\SimpleSoundboard.Extensions.csproj" />
     <ProjectReference Include="..\SimpleSoundboard.Interfaces\SimpleSoundboard.Interfaces.csproj" />
     <ProjectReference Include="..\SimpleSoundboard.Models\SimpleSoundboard.Models.csproj" />
+    <ProjectReference Include="..\SimpleSoundboard.NAudio\SimpleSoundboard.NAudio.csproj" />
     <ProjectReference Include="..\SimpleSoundboard.Views\SimpleSoundboard.Views.csproj" />
   </ItemGroup>
 

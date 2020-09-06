@@ -21,6 +21,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleSoundboard.Keyboard",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleSoundboard.NameService", "src\SimpleSoundboard.NameService\SimpleSoundboard.NameService.csproj", "{A3273538-B706-4939-9CBC-F1B6BE1D023D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleSoundboard.Extensions", "src\SimpleSoundboard.Extensions\SimpleSoundboard.Extensions.csproj", "{CEDEB541-031F-412E-8AD2-DD054ABFFCB4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -63,6 +65,10 @@ Global
 		{A3273538-B706-4939-9CBC-F1B6BE1D023D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A3273538-B706-4939-9CBC-F1B6BE1D023D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A3273538-B706-4939-9CBC-F1B6BE1D023D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CEDEB541-031F-412E-8AD2-DD054ABFFCB4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CEDEB541-031F-412E-8AD2-DD054ABFFCB4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CEDEB541-031F-412E-8AD2-DD054ABFFCB4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CEDEB541-031F-412E-8AD2-DD054ABFFCB4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

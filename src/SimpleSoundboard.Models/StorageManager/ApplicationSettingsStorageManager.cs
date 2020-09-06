@@ -1,10 +1,9 @@
-﻿
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Windows.Forms;
 using SimpleSoundboard.Interfaces.Models.Models;
 using SimpleSoundboard.Models.Base;
 using SimpleSoundboard.NameService.Models;
+using SimpleSoundboard.NameService.NAudio;
 using Soundboard.Entities;
 
 namespace SimpleSoundboard.Interfaces.Models.StorageManager
@@ -22,7 +21,7 @@ namespace SimpleSoundboard.Interfaces.Models.StorageManager
 			{
 				AccentColor = ApplicationAccentColor.Orange,
 				InputDevice = null,
-				OutputDevices = new List<string>() {String.Empty,String.Empty},
+				OutputDevices = new List<string>() { NAudioControllerConstants.SoundMapper, NAudioControllerConstants.NoneDevice },
 				StopKeys = new List<Keys>(){Keys.Back},
 				Style = ApplicationStyle.Dark,
 				Volumes = new List<float>(){0.5f,0.5f}

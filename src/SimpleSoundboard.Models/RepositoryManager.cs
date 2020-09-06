@@ -25,6 +25,12 @@ namespace SimpleSoundboard.Models
 			}
 		}
 
+		public IRepository<TType> Get<TType>(Type modelType) where TType : class,IBaseModel
+		{
+			return this[modelType] as IRepository<TType>;
+		}
+
+
 		public void SetEntityState(EntityState entityState)
 		{
 			foreach (var repository in Values)

@@ -10,4 +10,8 @@
     <PackageReference Include="NAudio" Version="1.10.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\SimpleSoundboard.Interfaces\SimpleSoundboard.Interfaces.csproj" />
+  </ItemGroup>
+
 </Project>

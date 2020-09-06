@@ -10,5 +10,6 @@ namespace SimpleSoundboard.Interfaces.Models
 		void Load();
 		void Save();
 		void SetEntityState(EntityState entityState);
+		IRepository<TType> Get<TType>(Type modelType) where TType : class, IBaseModel;
 	}
 }

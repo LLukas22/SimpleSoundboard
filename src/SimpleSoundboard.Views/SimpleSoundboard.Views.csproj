@@ -16,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\SimpleSoundboard.Extensions\SimpleSoundboard.Extensions.csproj" />
     <ProjectReference Include="..\SimpleSoundboard.Interfaces\SimpleSoundboard.Interfaces.csproj" />
   </ItemGroup>
 

@@ -32,6 +32,17 @@ namespace SimpleSoundboard.Models.Base
 
 		public void Save()
 		{
+			foreach (var key in models.Keys)
+			{
+				if (models[key].EntityState == EntityState.Deleted)
+				{
+					models.Remove(key);
+				}
+				else
+				{
+					models[key].SetEntityState(EntityState.None);
+				}
+			}
 			storageManager.Save(GetDictionary().Values);
 		}
 

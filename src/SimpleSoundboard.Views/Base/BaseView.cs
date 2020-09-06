@@ -1,4 +1,5 @@
-﻿using System.Windows.Forms;
+﻿using System;
+using System.Windows.Forms;
 using MetroFramework.Components;
 using MetroFramework.Forms;
 using SimpleSoundboard.Interfaces.Controller.Base;
@@ -14,6 +15,13 @@ namespace SimpleSoundboard.Views.Base
 		{
 			InitializeComponent();
 			styleManager.Clone(this);
+			
+		}
+
+		protected override void OnLoad(EventArgs e)
+		{
+			Subscribe();
+			base.OnLoad(e);
 		}
 
 		public IView Show(IWin32Window owner = null)
@@ -27,6 +35,11 @@ namespace SimpleSoundboard.Views.Base
 				this.Show(owner);
 			}
 			return this;
+		}
+
+		protected virtual void Subscribe()
+		{
+
 		}
 
 		public virtual IView Refresh()
