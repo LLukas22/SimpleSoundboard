@@ -1,10 +1,12 @@
 ﻿
 using System;
+using System.ComponentModel;
 using System.Windows.Forms;
 using MetroFramework.Components;
 using MetroFramework.Controls;
 using NAudio.Gui;
 using SimpleSoundboard.Controller;
+using SimpleSoundboard.Interfaces.Models.Models;
 using SimpleSoundboard.Interfaces.Views;
 using SimpleSoundboard.NameService.NAudio;
 using SimpleSoundboard.Views.Base;
@@ -20,10 +22,10 @@ namespace SimpleSoundboard.Views.Views
 			this.VolumeSliderOutput2.WithStyleManager(ref styleManager);
 		}
 
-		public BindingContext GridBindingContext
+		public BindingList<IAudioEntryModel> GridBindingSource
 		{
-			get => this.metroGrid1.BindingContext;
-			set => this.metroGrid1.BindingContext = value;
+			get => this.metroGrid1.DataSource as BindingList<IAudioEntryModel>;
+			set => this.metroGrid1.DataSource = value;
 		}
 
 		public object OutputDevice1DataSource
@@ -46,21 +48,28 @@ namespace SimpleSoundboard.Views.Views
 		{
 			this.btn_Add.Click += Btn_AddOnClick;
 			this.btn_Delete.Click += Btn_DeleteOnClick;
-			this.btn_Play.Click += Btn_PlayOnClick;
-			this.btn_Save.Click += Btn_SaveOnClick;
+			this.btn_Play.Click += (sender, args) => (controller as IMainController)?.Play();
+			this.btn_Save.Click += (sender, args) => (controller as IMainController)?.Save();
 			this.btn_Settings.Click += Btn_SettingsOnClick;
-			this.btn_Stop.Click += Btn_StopOnClick;
-			this.metroComboBox__OutputDevice1.SelectedValueChanged += MetroComboBox__OutputDevice1OnSelectedValueChanged;
-			this.metroComboBox_OutputDevice2.SelectedValueChanged += MetroComboBox_OutputDevice2OnSelectedValueChanged;
+			this.btn_Stop.Click += (sender, args) => (controller as IMainController)?.Stop();
+			this.metroComboBox__OutputDevice1.SelectedValueChanged += (sender, args) =>
+				(controller as IMainController)?.UpdateOutputDevice(0,
+					(string)this.metroComboBox__OutputDevice1.SelectedValue);
+			this.metroComboBox_OutputDevice2.SelectedValueChanged += (sender, args) =>
+				(controller as IMainController)?.UpdateOutputDevice(1,
+					(string) this.metroComboBox_OutputDevice2.SelectedValue);
+			this.VolumeSliderOutput1.VolumeChanged += (sender, args) => (controller as IMainController)?.ChangeVolume(0, VolumeSliderOutput1.Volume);
+			this.VolumeSliderOutput2.VolumeChanged += (sender, args) => (controller as IMainController)?.ChangeVolume(1, VolumeSliderOutput2.Volume);
 			base.Subscribe();
 		}
+
+		
 
 		public IMainView SetOutputDevice1(string value)
 		{
 			SetComboBoxValue(this.metroComboBox__OutputDevice1, value);
 			return this;
 		}
-
 
 		public IMainView SetOutputDevice2(string value)
 		{
@@ -82,34 +91,22 @@ namespace SimpleSoundboard.Views.Views
 			}
 		}
 
-		private void MetroComboBox_OutputDevice2OnSelectedValueChanged(object? sender, EventArgs e)
+		public IMainView SetVolumeSliderValue(int outputDevice, float value)
 		{
-			(controller as IMainController)?.UpdateOutputDevice(1, (string)this.metroComboBox_OutputDevice2.SelectedValue);
-		}
-
-		private void MetroComboBox__OutputDevice1OnSelectedValueChanged(object? sender, EventArgs e)
-		{
-			(controller as IMainController)?.UpdateOutputDevice(0, (string)this.metroComboBox__OutputDevice1.SelectedValue);
-		}
-
-		private void Btn_StopOnClick(object? sender, EventArgs e)
-		{
-			(controller as IMainController)?.Stop();
+			if (outputDevice == 0)
+			{
+				this.VolumeSliderOutput1.Volume = value;
+			}
+			else
+			{
+				this.VolumeSliderOutput2.Volume = value;
+			}
+			return this;
 		}
 
 		private void Btn_SettingsOnClick(object? sender, EventArgs e)
 		{
 			
-		}
-
-		private void Btn_SaveOnClick(object? sender, EventArgs e)
-		{
-			(controller as IMainController)?.Save();
-		}
-
-		private void Btn_PlayOnClick(object? sender, EventArgs e)
-		{
-			(controller as IMainController)?.Play();
 		}
 
 		private void Btn_DeleteOnClick(object? sender, EventArgs e)

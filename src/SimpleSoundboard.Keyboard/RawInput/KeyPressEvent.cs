@@ -20,13 +20,13 @@ namespace Soundboard.RawInput
 		public string Source
 		{
 			get => _source;
-			set => _source = string.Format("Keyboard_{0}", value.PadLeft(2, '0'));
+			set => _source = $"Keyboard_{value.PadLeft(2, '0')}";
 		}
 
 		public override string ToString()
 		{
-			return string.Format("Device\n DeviceName: {0}\n DeviceType: {1}\n DeviceHandle: {2}\n Name: {3}\n",
-				DeviceName, DeviceType, DeviceHandle.ToInt64().ToString("X"), Name);
+			return
+				$"Device\n DeviceName: {DeviceName}\n DeviceType: {DeviceType}\n DeviceHandle: {DeviceHandle.ToInt64():X}\n Name: {Name}\n";
 		}
 	}
 }

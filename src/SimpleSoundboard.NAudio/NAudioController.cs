@@ -10,7 +10,6 @@ namespace SimpleSoundboard.NAudio
 	public class NAudioController : INAudioController
 	{
 		private readonly int outputChannelCount;
-		private readonly Dictionary<int, VolumeSlider> mappedVolumeSliders;
 		private readonly Dictionary<int, string> mappedOutputDevices;
 		private Dictionary<string, int> outputDevices;
 		private readonly List<OutStreamController> outStreamController;
@@ -19,12 +18,11 @@ namespace SimpleSoundboard.NAudio
 		{
 			outputChannelCount = outputChannels;
 			GetWaveOutCapabilities();
-			mappedVolumeSliders = new Dictionary<int, VolumeSlider>(outputChannelCount);
 			mappedOutputDevices = new Dictionary<int, string>(outputChannelCount);
 			outStreamController = new List<OutStreamController>(outputChannelCount);
 			for (int i = 0; i < outputChannelCount; i++)
 			{
-				outStreamController.Add(new OutStreamController(ref mappedVolumeSliders,ref mappedOutputDevices,ref outputDevices,i));
+				outStreamController.Add(new OutStreamController(ref mappedOutputDevices,ref outputDevices,i));
 			}
 			outputDevices = new Dictionary<string, int>();
 		}
@@ -43,20 +41,6 @@ namespace SimpleSoundboard.NAudio
 			return outputDevices;
 		}
 
-		public INAudioController RegisterVolumeSlider(int outputChannel, VolumeSlider volumeSlider)
-		{
-			Stop(false);
-			if (mappedVolumeSliders.ContainsKey(outputChannel))
-			{
-				mappedVolumeSliders[outputChannel] = volumeSlider;
-			}
-			else
-			{
-				mappedVolumeSliders.Add(outputChannel, volumeSlider);
-			}
-			return this;
-		}
-
 		public INAudioController RegisterOutputDevice(int outputChannel, string deviceName)
 		{
 			Stop(false);
@@ -71,6 +55,11 @@ namespace SimpleSoundboard.NAudio
 			return this;
 		}
 
+		public INAudioController ChangeVolume(int outputChannel, float volume)
+		{
+			outStreamController[outputChannel].ChangeVolume(volume);
+			return this;
+		}
 
 		public INAudioController Play(string audioFile, float volumeModifier = 1)
 		{

@@ -10,23 +10,24 @@ namespace SimpleSoundboard.NAudio
 {
 	public class OutStreamController
 	{
-		private readonly Dictionary<int, VolumeSlider> mappedVolumeSliders;
 		private readonly Dictionary<int, string> mappedOutputDevices;
 		private readonly Dictionary<string, int> outputDevices;
 		private readonly int outputIndex;
+		private float externalVolume;
 		private CancellationTokenSource tokenSource;
 		private CancellationToken token;
 		private readonly ConcurrentDictionary<string,AudioFileReader> fileReaders = new ConcurrentDictionary<string, AudioFileReader>();
 		private readonly ConcurrentDictionary<string, WaveOutEvent> waveOutEvents = new ConcurrentDictionary<string, WaveOutEvent>();
-		private readonly ConcurrentDictionary<string, Action<float>> volumeDelegates = new ConcurrentDictionary<string, Action<float>>();
+		private readonly ConcurrentDictionary<string, float> volumeModifiers = new ConcurrentDictionary<string, float>();
 
 
-		public OutStreamController(ref Dictionary<int, VolumeSlider> mappedVolumeSliders,ref  Dictionary<int, string> mappedOutputDevices,ref Dictionary<string, int> outputDevices,int outputIndex)
+		public OutStreamController(ref  Dictionary<int, string> mappedOutputDevices,ref Dictionary<string, int> outputDevices,int outputIndex, float defaultVolume = 0.5f)
 		{
-			this.mappedVolumeSliders = mappedVolumeSliders;
+		
 			this.mappedOutputDevices = mappedOutputDevices;
 			this.outputDevices = outputDevices;
 			this.outputIndex = outputIndex;
+			this.externalVolume = defaultVolume;
 			this.tokenSource = new CancellationTokenSource();
 			token = tokenSource.Token;
 		}
@@ -36,7 +37,7 @@ namespace SimpleSoundboard.NAudio
 		{
 
 			int outputDevice = Int32.MinValue;
-			VolumeSlider volumeSlider = null;
+			
 
 			if (mappedOutputDevices.ContainsKey(outputIndex))
 			{
@@ -49,24 +50,29 @@ namespace SimpleSoundboard.NAudio
 			if (outputDevice == Int32.MinValue)
 				return;
 
-			if (mappedVolumeSliders.ContainsKey(outputIndex))
-				volumeSlider = mappedVolumeSliders[outputIndex];
-
 			var guid = Guid.NewGuid().ToString("N").Substring(0, 8);
 
 			Task.Run(() =>
 			{
 				var fileReader = new AudioFileReader(audioFile);
-				Action<float> volumeDelegate = vol => fileReader.Volume = vol;
-				volumeDelegate?.Invoke(volumeSlider?.Volume ?? 0.5f * volumeModifier);
+				fileReader.Volume = externalVolume * volumeModifier;
 				var waveOutEvent = new WaveOutEvent {DeviceNumber = outputDevice};
 				waveOutEvent.PlaybackStopped += (sender, e) => WaveOutEventOnPlaybackStopped(sender, e, guid);
 				waveOutEvent.Init(fileReader);
 				fileReaders.TryAdd(guid, fileReader);
 				waveOutEvents.TryAdd(guid, waveOutEvent);
-				volumeDelegates.TryAdd(guid, volumeDelegate);
+				volumeModifiers.TryAdd(guid, volumeModifier);
 				waveOutEvent.Play();
 			}, token);
+		}
+
+		public void ChangeVolume(float volume)
+		{
+			externalVolume = volume;
+			foreach (var id in fileReaders.Keys)
+			{
+				fileReaders[id].Volume = externalVolume * volumeModifiers[id];
+			}
 		}
 
 		public void Stop()
@@ -79,7 +85,7 @@ namespace SimpleSoundboard.NAudio
 			}
 			fileReaders.Clear();
 			waveOutEvents.Clear();
-			volumeDelegates.Clear();
+			volumeModifiers.Clear();
 
 			tokenSource = new CancellationTokenSource();
 			token = tokenSource.Token;
@@ -94,7 +100,7 @@ namespace SimpleSoundboard.NAudio
 		private void RemoveViaId(string id)
 		{
 			DisposeAndRemove(waveOutEvents, id);
-			DisposeAndRemove(volumeDelegates, id);
+			DisposeAndRemove(volumeModifiers, id);
 			DisposeAndRemove(fileReaders, id);
 		}
 

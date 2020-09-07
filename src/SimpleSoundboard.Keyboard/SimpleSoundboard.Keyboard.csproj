@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\SimpleSoundboard.Interfaces\SimpleSoundboard.Interfaces.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Reference Include="Microsoft.Win32.Registry">
       <HintPath>C:\Program Files\dotnet\packs\Microsoft.WindowsDesktop.App.Ref\5.0.0-preview.8.20411.6\ref\net5.0\Microsoft.Win32.Registry.dll</HintPath>
     </Reference>
