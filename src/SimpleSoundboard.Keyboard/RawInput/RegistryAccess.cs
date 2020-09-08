@@ -1,6 +1,6 @@
 ﻿using Microsoft.Win32;
 
-namespace Soundboard.RawInput
+namespace SimpleSoundboard.Keyboard.RawInput
 {
 	internal static class RegistryAccess
 	{

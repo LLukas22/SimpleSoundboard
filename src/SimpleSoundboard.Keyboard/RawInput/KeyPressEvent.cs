@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Soundboard.RawInput
+namespace SimpleSoundboard.Keyboard.RawInput
 {
 	public class KeyPressEvent
 	{

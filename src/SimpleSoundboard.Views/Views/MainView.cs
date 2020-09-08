@@ -17,7 +17,15 @@ namespace SimpleSoundboard.Views.Views
 	{
 		public MainView(MetroStyleManager styleManager) : base(styleManager)
 		{
-			InitializeComponent();
+			try
+			{
+				InitializeComponent();
+			}
+			catch
+			{
+
+			}
+			
 			this.VolumeSliderOutput1.WithStyleManager(ref styleManager);
 			this.VolumeSliderOutput2.WithStyleManager(ref styleManager);
 		}

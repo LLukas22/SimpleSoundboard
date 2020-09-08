@@ -1,10 +1,10 @@
 ﻿using SimpleSoundboard.Interfaces.Keyboard;
 using SimpleSoundboard.Interfaces.Root.Base;
+using SimpleSoundboard.Keyboard;
 using SimpleSoundboard.NAudio;
 using SimpleSoundboard.Root.Base;
 using SimpleSoundboard.Root.Registrations;
 using Soundboard.Audio;
-using Soundboard.Keyboard;
 using Unity;
 using Unity.Lifetime;
 

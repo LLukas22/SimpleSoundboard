@@ -1,7 +1,7 @@
 ﻿using System.Globalization;
 using System.Windows.Forms;
 
-namespace Soundboard.RawInput
+namespace SimpleSoundboard.Keyboard.RawInput
 {
 	public static class KeyMapper
 	{

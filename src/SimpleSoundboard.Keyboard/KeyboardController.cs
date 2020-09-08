@@ -2,15 +2,12 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Windows.Forms;
-using System.Xml;
 using SimpleSoundboard.Interfaces.Keyboard;
-using SimpleSoundboard.Keyboard;
+using SimpleSoundboard.Keyboard.RawInput;
 using SimpleSoundboard.NameService.Keyboard;
-using Soundboard.RawInput;
 
-namespace Soundboard.Keyboard
+namespace SimpleSoundboard.Keyboard
 {
 	public class KeyboardController : IKeyboardController
 	{

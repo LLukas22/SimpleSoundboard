@@ -4,7 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Runtime.InteropServices;
 
-namespace Soundboard.RawInput
+namespace SimpleSoundboard.Keyboard.RawInput
 {
 	public static class Win32
 	{

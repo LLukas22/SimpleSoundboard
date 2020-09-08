@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 
-namespace Soundboard.RawInput
+namespace SimpleSoundboard.Keyboard.RawInput
 {
 	public class RawInputEventArg : EventArgs
 	{

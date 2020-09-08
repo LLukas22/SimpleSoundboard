@@ -5,7 +5,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.InteropServices;
 
-namespace Soundboard.RawInput
+namespace SimpleSoundboard.Keyboard.RawInput
 {
 	public sealed class RawKeyboard
 	{
