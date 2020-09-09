@@ -1,7 +1,7 @@
 ﻿using SimpleSoundboard.Interfaces.Controller.Base;
 using SimpleSoundboard.Interfaces.Views;
 
-namespace SimpleSoundboard.Controller
+namespace SimpleSoundboard.Interfaces.Controller
 {
 	public interface IMainController : IController<IMainView>
 	{
@@ -10,5 +10,6 @@ namespace SimpleSoundboard.Controller
 		void Play();
 		void Stop();
 		void ChangeVolume(int outputDevice, float value);
+		void OpenSettings();
 	}
 }

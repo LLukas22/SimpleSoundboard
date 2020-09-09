@@ -1,13 +1,16 @@
-﻿using System;
+﻿
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Security.Cryptography.Pkcs;
 using System.Windows.Forms;
 using SimpleSoundboard.Controller.Base;
+using SimpleSoundboard.Interfaces.Controller;
 using SimpleSoundboard.Interfaces.Controller.Base;
 using SimpleSoundboard.Interfaces.Keyboard;
 using SimpleSoundboard.Interfaces.Models;
 using SimpleSoundboard.Interfaces.Models.Models;
+using SimpleSoundboard.Interfaces.Root;
 using SimpleSoundboard.Interfaces.Views;
 using Soundboard.Audio;
 using Unity;
@@ -18,17 +21,20 @@ namespace SimpleSoundboard.Controller
 	{
 		[Dependency] public INAudioController NAudioController { get; set; }
 		[Dependency] public IKeyboardController KeyboardController { get; set; }
+		[Dependency] public IRepositoryManager RepositoryManager { get; set; }
+		[Dependency] public IControllerFactory ControllerFactory { get; set; }
+		private IApplicationSettingsModel activeApplicationSettings;
 
-		private readonly IApplicationSettingsModel activeApplicationSettings;
-
-		public MainController(IRepositoryManager repositoryManager, IMainView view) : base(repositoryManager, view)
+		public MainController(IMainView view) : base(view)
 		{
-			activeApplicationSettings = repositoryManager
-				.Get<IApplicationSettingsModel>(typeof(IApplicationSettingsModel)).GetDictionary().Values.First();
+			
 		}
 
 		public override IController<IMainView> Initialize()
 		{
+			activeApplicationSettings = RepositoryManager
+				.Get<IApplicationSettingsModel>(typeof(IApplicationSettingsModel)).GetDictionary().Values.First();
+
 			var waveOutCapabilities = NAudioController.GetWaveOutCapabilities();
 			SpecificView.OutputDevice1DataSource = new List<string>(waveOutCapabilities.Keys);
 			SpecificView.OutputDevice2DataSource = new List<string>(waveOutCapabilities.Keys);
@@ -55,7 +61,7 @@ namespace SimpleSoundboard.Controller
 
 		public void UpdateDataSource()
 		{
-			SpecificView.GridBindingSource = new BindingList<IAudioEntryModel>(repositoryManager
+			SpecificView.GridBindingSource = new BindingList<IAudioEntryModel>(RepositoryManager
 				.Get<IAudioEntryModel>(typeof(IAudioEntryModel)).GetDictionary().Values.ToList());
 		}
 
@@ -67,7 +73,7 @@ namespace SimpleSoundboard.Controller
 
 		public void Save()
 		{
-			repositoryManager.Save();
+			RepositoryManager.Save();
 		}
 
 		public void Play()
@@ -84,6 +90,12 @@ namespace SimpleSoundboard.Controller
 		{
 			activeApplicationSettings.Volumes[outputDevice] = value;
 			NAudioController.ChangeVolume(outputDevice, activeApplicationSettings.Volumes[outputDevice]);
+		}
+
+		public void OpenSettings()
+		{
+			var settingsController = (ISettingsController)ControllerFactory.Create(typeof(ISettingsController));
+			settingsController.BindingData(activeApplicationSettings).Initialize().Show(this);
 		}
 	}
 }

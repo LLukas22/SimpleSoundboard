@@ -13,5 +13,6 @@ namespace SimpleSoundboard.Interfaces.Models.Base
 		Guid Id { get; set; }
 		event PropertyChangedEventHandler PropertyChanged;
 		void SetEntityState(EntityState entityState);
+		public IBaseModel Clone();
 	}
 }

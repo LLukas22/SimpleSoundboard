@@ -46,5 +46,10 @@ namespace Soundboard.Entities
 		{
 			this.EntityState = entityState;
 		}
+
+		public IBaseModel Clone()
+		{
+			return (IBaseModel)this.MemberwiseClone();
+		}
 	}
 }

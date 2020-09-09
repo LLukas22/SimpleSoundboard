@@ -2,6 +2,7 @@
 using System;
 using System.Windows.Forms;
 using SimpleSoundboard.Controller;
+using SimpleSoundboard.Interfaces.Controller;
 using SimpleSoundboard.Root;
 using Unity;
 

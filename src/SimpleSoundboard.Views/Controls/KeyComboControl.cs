@@ -1,27 +1,42 @@
 ﻿
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
+using MetroFramework;
 
 namespace SimpleSoundboard.Views.Controls
 {
 	public class KeyComboControl : CustomMetroTextBox
 	{
 		public int ComboLength { get; set; } = 3;
-		private readonly List<Keys> keyCombo;
+		private List<Keys> keyCombo;
+
+		public delegate void ComboChangedHandler(object sender, EventArgs e);
+		public event ComboChangedHandler OnComboChanged;
 
 		public KeyComboControl()
 		{
 			this.keyCombo = new List<Keys>();
-			Text = string.Empty;
 			ReadOnly = true;
+			FontSize = MetroTextBoxSize.Medium;
 			KeyDown += OnKeyDown;
 			var toolTip = new ToolTip();
 			toolTip.SetToolTip(this, "Focus this and Start Typing (ESC to Clear Selection)");
 		}
 
+		public void Initialize(IEnumerable<Keys> keyCombo)
+		{
+			Text = string.Empty;
+			this.keyCombo = new List<Keys>(keyCombo);
+			RefreshText();
+		}
+
 		private void OnKeyDown(object sender, KeyEventArgs e)
 		{
+			if (keyCombo.Any(x => x == e.KeyCode))
+				return;
+			
 			if (e.KeyCode == Keys.Escape)
 			{
 				keyCombo.Clear();
@@ -36,7 +51,7 @@ namespace SimpleSoundboard.Views.Controls
 				keyCombo.Add(e.KeyCode);
 			}
 			RefreshText();
-			return;
+			OnComboChanged?.Invoke(this,null);
 		}
 
 		private void RefreshText()

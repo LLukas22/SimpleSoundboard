@@ -1,11 +1,10 @@
 ﻿
 using System;
 using System.ComponentModel;
-using System.Windows.Forms;
 using MetroFramework.Components;
 using MetroFramework.Controls;
 using NAudio.Gui;
-using SimpleSoundboard.Controller;
+using SimpleSoundboard.Interfaces.Controller;
 using SimpleSoundboard.Interfaces.Models.Models;
 using SimpleSoundboard.Interfaces.Views;
 using SimpleSoundboard.NameService.NAudio;
@@ -17,15 +16,7 @@ namespace SimpleSoundboard.Views.Views
 	{
 		public MainView(MetroStyleManager styleManager) : base(styleManager)
 		{
-			try
-			{
-				InitializeComponent();
-			}
-			catch
-			{
-
-			}
-			
+			InitializeComponent();
 			this.VolumeSliderOutput1.WithStyleManager(ref styleManager);
 			this.VolumeSliderOutput2.WithStyleManager(ref styleManager);
 		}
@@ -58,7 +49,7 @@ namespace SimpleSoundboard.Views.Views
 			this.btn_Delete.Click += Btn_DeleteOnClick;
 			this.btn_Play.Click += (sender, args) => (controller as IMainController)?.Play();
 			this.btn_Save.Click += (sender, args) => (controller as IMainController)?.Save();
-			this.btn_Settings.Click += Btn_SettingsOnClick;
+			this.btn_Settings.Click += (sender, args) => (controller as IMainController)?.OpenSettings();
 			this.btn_Stop.Click += (sender, args) => (controller as IMainController)?.Stop();
 			this.metroComboBox__OutputDevice1.SelectedValueChanged += (sender, args) =>
 				(controller as IMainController)?.UpdateOutputDevice(0,
@@ -110,11 +101,6 @@ namespace SimpleSoundboard.Views.Views
 				this.VolumeSliderOutput2.Volume = value;
 			}
 			return this;
-		}
-
-		private void Btn_SettingsOnClick(object? sender, EventArgs e)
-		{
-			
 		}
 
 		private void Btn_DeleteOnClick(object? sender, EventArgs e)

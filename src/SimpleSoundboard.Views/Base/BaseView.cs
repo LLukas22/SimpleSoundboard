@@ -28,11 +28,11 @@ namespace SimpleSoundboard.Views.Base
 		{
 			if (owner == null)
 			{
-				this.Show();
+				base.Show();
 			}
 			else
 			{
-				this.Show(owner);
+				base.Show(owner);
 			}
 			return this;
 		}
