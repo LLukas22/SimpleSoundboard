@@ -9,6 +9,7 @@ namespace SimpleSoundboard.Keyboard
 		public static string ToStringAdded(this List<Keys> keys)
 		{
 			var result = string.Empty;
+			if (keys == null) return result;
 			for (int i = 0; i < keys.Count(); i++)
 			{
 				if (i == keys.Count() - 1)

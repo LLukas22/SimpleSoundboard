@@ -8,7 +8,7 @@ namespace SimpleSoundboard.Interfaces.Models.Models
 	{
 		List<Keys> KeyBinding { get; set; }
 		string KeyboardName { get; set; }
-		bool UseDefaultKeyboard { get; set; }
+		bool UseSpecificKeyboard { get; set; }
 		string FilePath { get; set; }
 		float Volume { get; set; }
 	}

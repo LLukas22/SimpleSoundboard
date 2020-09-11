@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System.Collections.Generic;
+using System.ComponentModel;
 using System.Windows.Forms;
 using NAudio.Gui;
 using SimpleSoundboard.Interfaces.Models.Models;
@@ -16,5 +17,7 @@ namespace SimpleSoundboard.Interfaces.Views
 		VolumeSlider VolumeSlider1 { get; }
 		VolumeSlider VolumeSlider2 { get; }
 		IMainView SetVolumeSliderValue(int outputDevice, float value);
+		IMainView SetStopButtonText(List<Keys> combo);
+		IMainView RefreshGrid(IEnumerable<IAudioEntryModel> audioEntries);
 	}
 }

@@ -28,7 +28,7 @@ namespace SimpleSoundboard.Views.Controls
 		public void Initialize(IEnumerable<Keys> keyCombo)
 		{
 			Text = string.Empty;
-			this.keyCombo = new List<Keys>(keyCombo);
+			this.keyCombo = new List<Keys>(keyCombo ?? new List<Keys>());
 			RefreshText();
 		}
 

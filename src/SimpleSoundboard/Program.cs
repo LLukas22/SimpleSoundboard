@@ -1,5 +1,6 @@
 
 using System;
+using System.Media;
 using System.Windows.Forms;
 using SimpleSoundboard.Controller;
 using SimpleSoundboard.Interfaces.Controller;

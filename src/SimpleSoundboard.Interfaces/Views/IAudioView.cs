@@ -3,8 +3,8 @@ using SimpleSoundboard.Interfaces.Views.Base;
 
 namespace SimpleSoundboard.Interfaces.Views
 {
-	public interface ISettingsView : IView
+	public interface IAudioView : IView
 	{
-		void BindData(ref IApplicationSettingsModel original, IApplicationSettingsModel model);
+		void BindData(ref IAudioEntryModel original, IAudioEntryModel clone);
 	}
 }

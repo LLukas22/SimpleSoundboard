@@ -37,8 +37,8 @@
 			this.metroComboBox_Style = new MetroFramework.Controls.MetroComboBox();
 			this.metroComboBox_Color = new MetroFramework.Controls.MetroComboBox();
 			this.metroLabel4 = new MetroFramework.Controls.MetroLabel();
-			this.metroButton1 = new MetroFramework.Controls.MetroButton();
-			this.metroButton2 = new MetroFramework.Controls.MetroButton();
+			this.btn_OpenFolder = new MetroFramework.Controls.MetroButton();
+			this.btn_KeyboardInput = new MetroFramework.Controls.MetroButton();
 			this.SuspendLayout();
 			// 
 			// btn_Cancel
@@ -152,31 +152,31 @@
 			this.metroLabel4.TabIndex = 22;
 			this.metroLabel4.Text = "Debug:";
 			// 
-			// metroButton1
+			// btn_OpenFolder
 			// 
-			this.metroButton1.Location = new System.Drawing.Point(121, 162);
-			this.metroButton1.Name = "metroButton1";
-			this.metroButton1.Size = new System.Drawing.Size(281, 36);
-			this.metroButton1.TabIndex = 23;
-			this.metroButton1.Text = "Open Settings Folder";
-			this.metroButton1.UseSelectable = true;
+			this.btn_OpenFolder.Location = new System.Drawing.Point(121, 162);
+			this.btn_OpenFolder.Name = "btn_OpenFolder";
+			this.btn_OpenFolder.Size = new System.Drawing.Size(281, 36);
+			this.btn_OpenFolder.TabIndex = 23;
+			this.btn_OpenFolder.Text = "Open Settings Folder";
+			this.btn_OpenFolder.UseSelectable = true;
 			// 
-			// metroButton2
+			// btn_KeyboardInput
 			// 
-			this.metroButton2.Location = new System.Drawing.Point(121, 202);
-			this.metroButton2.Name = "metroButton2";
-			this.metroButton2.Size = new System.Drawing.Size(281, 36);
-			this.metroButton2.TabIndex = 24;
-			this.metroButton2.Text = "Show Raw Keyboard Input";
-			this.metroButton2.UseSelectable = true;
+			this.btn_KeyboardInput.Location = new System.Drawing.Point(121, 202);
+			this.btn_KeyboardInput.Name = "btn_KeyboardInput";
+			this.btn_KeyboardInput.Size = new System.Drawing.Size(281, 36);
+			this.btn_KeyboardInput.TabIndex = 24;
+			this.btn_KeyboardInput.Text = "Show Raw Keyboard Input";
+			this.btn_KeyboardInput.UseSelectable = true;
 			// 
 			// SettingsView
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(409, 289);
-			this.Controls.Add(this.metroButton2);
-			this.Controls.Add(this.metroButton1);
+			this.Controls.Add(this.btn_KeyboardInput);
+			this.Controls.Add(this.btn_OpenFolder);
 			this.Controls.Add(this.metroLabel4);
 			this.Controls.Add(this.metroComboBox_Color);
 			this.Controls.Add(this.metroComboBox_Style);
@@ -203,7 +203,7 @@
 		private MetroFramework.Controls.MetroComboBox metroComboBox_Style;
 		private MetroFramework.Controls.MetroComboBox metroComboBox_Color;
 		private MetroFramework.Controls.MetroLabel metroLabel4;
-		private MetroFramework.Controls.MetroButton metroButton1;
-		private MetroFramework.Controls.MetroButton metroButton2;
+		private MetroFramework.Controls.MetroButton btn_OpenFolder;
+		private MetroFramework.Controls.MetroButton btn_KeyboardInput;
 	}
 }

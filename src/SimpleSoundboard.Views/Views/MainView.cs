@@ -1,12 +1,16 @@
 ﻿
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
+using System.Windows.Forms;
 using MetroFramework.Components;
 using MetroFramework.Controls;
 using NAudio.Gui;
 using SimpleSoundboard.Interfaces.Controller;
 using SimpleSoundboard.Interfaces.Models.Models;
 using SimpleSoundboard.Interfaces.Views;
+using SimpleSoundboard.Keyboard;
 using SimpleSoundboard.NameService.NAudio;
 using SimpleSoundboard.Views.Base;
 
@@ -17,8 +21,13 @@ namespace SimpleSoundboard.Views.Views
 		public MainView(MetroStyleManager styleManager) : base(styleManager)
 		{
 			InitializeComponent();
+		}
+
+		public override void ApplyStyleManager()
+		{
 			this.VolumeSliderOutput1.WithStyleManager(ref styleManager);
 			this.VolumeSliderOutput2.WithStyleManager(ref styleManager);
+			base.ApplyStyleManager();
 		}
 
 		public BindingList<IAudioEntryModel> GridBindingSource
@@ -45,7 +54,7 @@ namespace SimpleSoundboard.Views.Views
 
 		protected override void Subscribe()
 		{
-			this.btn_Add.Click += Btn_AddOnClick;
+			this.btn_Add.Click += (sender, args) => (controller as IMainController)?.Add();
 			this.btn_Delete.Click += Btn_DeleteOnClick;
 			this.btn_Play.Click += (sender, args) => (controller as IMainController)?.Play();
 			this.btn_Save.Click += (sender, args) => (controller as IMainController)?.Save();
@@ -62,7 +71,30 @@ namespace SimpleSoundboard.Views.Views
 			base.Subscribe();
 		}
 
-		
+		public IMainView RefreshGrid(IEnumerable<IAudioEntryModel> audioEntries)
+		{
+			metroGrid1.AutoGenerateColumns = false;
+			metroGrid1.Columns.Add("File", "File");
+			metroGrid1.Columns.Add("Keys", "Keys");
+			metroGrid1.Columns.Add("Volume", "Volume");
+			metroGrid1.CellBorderStyle = DataGridViewCellBorderStyle.RaisedHorizontal;
+			metroGrid1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+			metroGrid1.ResetBindings();
+			metroGrid1.Rows.Clear();
+
+			foreach (var audioEntry in audioEntries)
+			{
+				metroGrid1.Rows.Add(Path.GetFileNameWithoutExtension(audioEntry.FilePath),
+					audioEntry.KeyBinding.ToStringAdded(), audioEntry.Volume);
+			}
+			return this;
+		}
+
+		public IMainView SetStopButtonText(List<Keys> combo)
+		{
+			this.btn_Stop.Text = $@"Stop{Environment.NewLine}{combo.ToStringAdded()}";
+			return this;
+		}
 
 		public IMainView SetOutputDevice1(string value)
 		{
@@ -108,9 +140,10 @@ namespace SimpleSoundboard.Views.Views
 			
 		}
 
-		private void Btn_AddOnClick(object? sender, EventArgs e)
+		protected override void OnClosing(CancelEventArgs e)
 		{
-			
+			(controller as IMainController)?.OnClosing(e);
 		}
+
 	}
 }

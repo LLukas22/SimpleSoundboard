@@ -32,5 +32,10 @@ namespace SimpleSoundboard.Controller.Base
 				View.Show((Form)parentController.View);
 			}
 		}
+
+		public DialogResult ShowDialogue(IController parentController = null)
+		{
+			return parentController == null ? View.ShowDialog() : View.ShowDialog((Form)parentController.View);
+		}
 	}
 }

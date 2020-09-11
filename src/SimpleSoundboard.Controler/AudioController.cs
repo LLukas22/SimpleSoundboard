@@ -6,14 +6,14 @@ using SimpleSoundboard.Interfaces.Views;
 
 namespace SimpleSoundboard.Controller
 {
-	public class SettingsController : AbstractModelController<ISettingsView,IApplicationSettingsModel>, ISettingsController
+	public class AudioController : AbstractModelController<IAudioView,IAudioEntryModel>, IAudioController
 	{
-		public SettingsController(ISettingsView view) : base(view)
+		public AudioController(IAudioView view) : base(view)
 		{
 
 		}
 
-		public override IController<ISettingsView> Initialize()
+		public override IController<IAudioView> Initialize()
 		{
 			SpecificView.BindData(ref model, clone);
 			return base.Initialize();

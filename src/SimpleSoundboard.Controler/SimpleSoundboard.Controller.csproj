@@ -13,6 +13,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SimpleSoundboard.Interfaces\SimpleSoundboard.Interfaces.csproj" />
+    <ProjectReference Include="..\SimpleSoundboard.Models\SimpleSoundboard.Models.csproj" />
+    <ProjectReference Include="..\SimpleSoundboard.Views\SimpleSoundboard.Views.csproj" />
   </ItemGroup>
 
 </Project>

@@ -18,6 +18,7 @@ namespace SimpleSoundboard.Root.Registrations
 		{
 			container.RegisterType<IMainView, MainView>(new ContainerControlledLifetimeManager());
 			container.RegisterType<ISettingsView, SettingsView>();
+			container.RegisterType<IAudioView, AudioView>();
 			return base.Register();
 		}
 	}

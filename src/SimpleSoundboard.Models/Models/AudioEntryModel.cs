@@ -12,7 +12,7 @@ namespace Soundboard.Entities
 
 		private string keyboardName;
 
-		private bool useDefaultKeyboard;
+		private bool useSpecificKeyboard=false;
 
 		private string filePath;
 
@@ -30,10 +30,10 @@ namespace Soundboard.Entities
 			set => SetProperty(ref keyboardName, value);
 		}
 
-		public bool UseDefaultKeyboard
+		public bool UseSpecificKeyboard
 		{
-			get => useDefaultKeyboard;
-			set => SetProperty(ref useDefaultKeyboard, value);
+			get => useSpecificKeyboard;
+			set => SetProperty(ref useSpecificKeyboard, value);
 		}
 
 		public string FilePath
@@ -47,6 +47,5 @@ namespace Soundboard.Entities
 			get => volume;
 			set => SetProperty(ref volume, value);
 		}
-
 	}
 }

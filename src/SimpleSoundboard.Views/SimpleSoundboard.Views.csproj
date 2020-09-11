@@ -18,6 +18,7 @@
   <ItemGroup>
     <ProjectReference Include="..\SimpleSoundboard.Extensions\SimpleSoundboard.Extensions.csproj" />
     <ProjectReference Include="..\SimpleSoundboard.Interfaces\SimpleSoundboard.Interfaces.csproj" />
+    <ProjectReference Include="..\SimpleSoundboard.Keyboard\SimpleSoundboard.Keyboard.csproj" />
   </ItemGroup>
 
   <Target Name="UpdateViews">

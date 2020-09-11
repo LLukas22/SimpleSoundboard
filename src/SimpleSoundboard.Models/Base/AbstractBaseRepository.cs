@@ -28,6 +28,7 @@ namespace SimpleSoundboard.Models.Base
 				if(model is null)continue;
 				models.Add(model.Id, model);
 			}
+			SetEntityState(EntityState.None);
 		}
 
 		public void Save()
@@ -50,6 +51,7 @@ namespace SimpleSoundboard.Models.Base
 		{
 			if(models.ContainsKey(model.Id))
 				throw new ArgumentException($"{model.GetType().Name} with ID {model.Id} is already in Repository {this.GetType().Name}");
+			model.SetEntityState(EntityState.Added);
 			models.Add(model.Id, model);
 		}
 
