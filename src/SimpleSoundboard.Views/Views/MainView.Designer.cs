@@ -52,6 +52,7 @@
 			// 
 			this.metroGrid1.AllowUserToAddRows = false;
 			this.metroGrid1.AllowUserToDeleteRows = false;
+			this.metroGrid1.AllowUserToResizeRows = false;
 			this.metroGrid1.BackgroundColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
 			this.metroGrid1.BorderStyle = System.Windows.Forms.BorderStyle.None;
 			this.metroGrid1.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None;
@@ -89,9 +90,10 @@
 			dataGridViewCellStyle3.SelectionForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(17)))), ((int)(((byte)(17)))), ((int)(((byte)(17)))));
 			dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
 			this.metroGrid1.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
+			this.metroGrid1.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
 			this.metroGrid1.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
 			this.metroGrid1.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-			this.metroGrid1.Size = new System.Drawing.Size(494, 454);
+			this.metroGrid1.Size = new System.Drawing.Size(494, 504);
 			this.metroGrid1.TabIndex = 0;
 			// 
 			// btn_Play

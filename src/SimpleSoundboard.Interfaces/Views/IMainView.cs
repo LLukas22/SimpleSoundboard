@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.ComponentModel;
 using System.Windows.Forms;
 using NAudio.Gui;
 using SimpleSoundboard.Interfaces.Models.Models;
@@ -9,7 +8,6 @@ namespace SimpleSoundboard.Interfaces.Views
 {
 	public interface IMainView : IView
 	{
-		BindingList<IAudioEntryModel> GridBindingSource { get; set; }
 		object OutputDevice1DataSource { get; set; }
 		object OutputDevice2DataSource { get; set; }
 		IMainView SetOutputDevice2(string value);
@@ -18,6 +16,6 @@ namespace SimpleSoundboard.Interfaces.Views
 		VolumeSlider VolumeSlider2 { get; }
 		IMainView SetVolumeSliderValue(int outputDevice, float value);
 		IMainView SetStopButtonText(List<Keys> combo);
-		IMainView RefreshGrid(IEnumerable<IAudioEntryModel> audioEntries);
+		IMainView RefreshGrid(List<IAudioEntryModel> audioEntries);
 	}
 }

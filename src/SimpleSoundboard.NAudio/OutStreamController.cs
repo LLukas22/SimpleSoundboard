@@ -63,7 +63,16 @@ namespace SimpleSoundboard.NAudio
 				waveOutEvents.TryAdd(guid, waveOutEvent);
 				volumeModifiers.TryAdd(guid, volumeModifier);
 				waveOutEvent.Play();
-			}, token);
+			}, token).ContinueWith((task) =>
+			{
+				if (task.IsFaulted)
+					ThrowException(task.Exception);
+			},token);
+		}
+
+		private void ThrowException(Exception exception)
+		{
+			throw exception;
 		}
 
 		public void ChangeVolume(float volume)
@@ -79,9 +88,9 @@ namespace SimpleSoundboard.NAudio
 		{
 			tokenSource.Cancel();
 
-			foreach (var id in waveOutEvents.Keys)
+			foreach (var waveOutEvent in waveOutEvents)
 			{
-				waveOutEvents[id].Stop();
+				waveOutEvent.Value.Stop();
 			}
 			fileReaders.Clear();
 			waveOutEvents.Clear();

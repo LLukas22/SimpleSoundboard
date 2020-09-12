@@ -1,5 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using MetroFramework.Components;
@@ -25,12 +27,19 @@ namespace SimpleSoundboard.Views.Views
 		{
 			this.btn_Ok.Click += Btn_OkOnClick;
 			this.btn_Cancel.Click += Btn_CancelOnClick;
+			this.btn_OpenFolder.Click += Btn_OpenFolderOnClick; 
 			this.keyComboControl.OnComboChanged += (sender, args) =>
 				this.clone.StopKeys = this.keyComboControl.GetCombo().ToList();
 			this.metroComboBox_Color.SelectedValueChanged += (sender, args) =>
 				SetEnum<ApplicationAccentColor>(metroComboBox_Color.SelectedValue.ToString());
 			this.metroComboBox_Style.SelectedValueChanged += (sender, args) =>
 				SetEnum<ApplicationStyle>(metroComboBox_Style.SelectedValue.ToString());
+		}
+
+		private void Btn_OpenFolderOnClick(object? sender, EventArgs e)
+		{
+			Process.Start("explorer.exe", @Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
+				"SimpleSoundboard"));
 		}
 
 		protected override void OnClosing(CancelEventArgs e)

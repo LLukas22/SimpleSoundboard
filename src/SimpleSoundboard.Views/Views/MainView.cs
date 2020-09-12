@@ -1,6 +1,7 @@
 ﻿
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.ComponentModel;
 using System.IO;
 using System.Windows.Forms;
@@ -30,10 +31,18 @@ namespace SimpleSoundboard.Views.Views
 			base.ApplyStyleManager();
 		}
 
-		public BindingList<IAudioEntryModel> GridBindingSource
+		private void InitializeGrid()
 		{
-			get => this.metroGrid1.DataSource as BindingList<IAudioEntryModel>;
-			set => this.metroGrid1.DataSource = value;
+			if (metroGrid1.ColumnCount > 0) return;
+			metroGrid1.AutoGenerateColumns = false;
+			metroGrid1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+			metroGrid1.Columns.Add("File", "File");
+			metroGrid1.Columns.Add("Keys", "Keys");
+			metroGrid1.Columns.Add("Volume", "Volume");
+			metroGrid1.Columns.Add("Id", "Id");
+			metroGrid1.Columns[3].Visible = false;
+			metroGrid1.CellBorderStyle = DataGridViewCellBorderStyle.RaisedHorizontal;
+			metroGrid1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
 		}
 
 		public object OutputDevice1DataSource
@@ -55,8 +64,9 @@ namespace SimpleSoundboard.Views.Views
 		protected override void Subscribe()
 		{
 			this.btn_Add.Click += (sender, args) => (controller as IMainController)?.Add();
-			this.btn_Delete.Click += Btn_DeleteOnClick;
-			this.btn_Play.Click += (sender, args) => (controller as IMainController)?.Play();
+			this.btn_Delete.Click += (sender, args) =>
+				(controller as IMainController)?.Delete(metroGrid1.SelectedRows.Count > 0 ? (Guid) metroGrid1.SelectedRows[0]?.Cells["Id"]?.Value : Guid.Empty);
+			this.btn_Play.Click += (sender, args) => (controller as IMainController)?.Play(metroGrid1.SelectedRows.Count > 0 ? (Guid)metroGrid1.SelectedRows[0]?.Cells["Id"]?.Value : Guid.Empty);
 			this.btn_Save.Click += (sender, args) => (controller as IMainController)?.Save();
 			this.btn_Settings.Click += (sender, args) => (controller as IMainController)?.OpenSettings();
 			this.btn_Stop.Click += (sender, args) => (controller as IMainController)?.Stop();
@@ -68,24 +78,30 @@ namespace SimpleSoundboard.Views.Views
 					(string) this.metroComboBox_OutputDevice2.SelectedValue);
 			this.VolumeSliderOutput1.VolumeChanged += (sender, args) => (controller as IMainController)?.ChangeVolume(0, VolumeSliderOutput1.Volume);
 			this.VolumeSliderOutput2.VolumeChanged += (sender, args) => (controller as IMainController)?.ChangeVolume(1, VolumeSliderOutput2.Volume);
+			this.metroGrid1.DoubleClick += (sender, args) =>
+				(controller as IMainController)?.Edit(metroGrid1.SelectedRows.Count > 0 ? (Guid)metroGrid1.SelectedRows[0]?.Cells["Id"]?.Value : Guid.Empty);
 			base.Subscribe();
 		}
 
-		public IMainView RefreshGrid(IEnumerable<IAudioEntryModel> audioEntries)
+		public IMainView RefreshGrid(List<IAudioEntryModel> audioEntries)
 		{
-			metroGrid1.AutoGenerateColumns = false;
-			metroGrid1.Columns.Add("File", "File");
-			metroGrid1.Columns.Add("Keys", "Keys");
-			metroGrid1.Columns.Add("Volume", "Volume");
-			metroGrid1.CellBorderStyle = DataGridViewCellBorderStyle.RaisedHorizontal;
-			metroGrid1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-			metroGrid1.ResetBindings();
+			InitializeGrid();
 			metroGrid1.Rows.Clear();
-
+			audioEntries.Sort((x, y) =>
+			{
+				if (x.KeyBinding.Count > y.KeyBinding.Count) return 1;
+				if (x.KeyBinding.Count < y.KeyBinding.Count) return -1;
+				for (int i = 0; i < x.KeyBinding.Count; i++)
+				{
+					var result = x.KeyBinding[i].CompareTo(y.KeyBinding[i]);
+					if (result != 0) return result;
+				}
+				return 0;
+			});
 			foreach (var audioEntry in audioEntries)
 			{
 				metroGrid1.Rows.Add(Path.GetFileNameWithoutExtension(audioEntry.FilePath),
-					audioEntry.KeyBinding.ToStringAdded(), audioEntry.Volume);
+					audioEntry.KeyBinding.ToStringAdded(), audioEntry.Volume, audioEntry.Id);
 			}
 			return this;
 		}

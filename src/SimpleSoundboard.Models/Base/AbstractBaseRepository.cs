@@ -13,7 +13,7 @@ namespace SimpleSoundboard.Models.Base
 		private readonly IStorageManager<TModel> storageManager;
 		private readonly Dictionary<Guid, TModel> models;
 		public bool IsDirty =>
-			models.Values.Any(x => x.EntityState == EntityState.Modified || x.EntityState == EntityState.Added);
+			models.Values.Any(x => x.EntityState != EntityState.None);
 		protected AbstractBaseRepository(IStorageManager<TModel> storageManager, IRepositoryManager repositoryManager)
 		{
 			this.storageManager = storageManager;

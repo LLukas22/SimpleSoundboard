@@ -9,7 +9,7 @@ namespace SimpleSoundboard.Models.Base
 	{
 		private readonly string storagePath;
 		protected string fileName;
-		private string fullFilePath => Path.Combine(storagePath, fileName + ".json");
+		protected string fullFilePath => Path.Combine(storagePath, fileName + ".json");
 
 		protected AbstractBaseStorageManager(string path)
 		{
@@ -21,11 +21,25 @@ namespace SimpleSoundboard.Models.Base
 		{
 			if (File.Exists(fullFilePath))
 			{
-				using StreamReader sr = File.OpenText(fullFilePath);
-				using JsonReader reader = new JsonTextReader(sr);
-				return ReturnSerializer().Deserialize<IEnumerable<TModel>>(reader);
+				try
+				{
+					using StreamReader sr = File.OpenText(fullFilePath);
+					using JsonReader reader = new JsonTextReader(sr);
+					return ReturnSerializer().Deserialize<IEnumerable<TModel>>(reader);
+				}
+				catch
+				{
+					//Try Legacy Deserialize
+					return LegacyLoad();
+				}
+
 			}
 			return new List<TModel>(){ReturnDefault()};
+		}
+
+		protected virtual IEnumerable<TModel> LegacyLoad()
+		{
+			return new List<TModel>() { ReturnDefault() };
 		}
 
 		public void Save(IEnumerable<TModel> models)
@@ -35,7 +49,7 @@ namespace SimpleSoundboard.Models.Base
 			ReturnSerializer().Serialize(writer, models);
 		}
 
-		private JsonSerializer ReturnSerializer()
+		protected JsonSerializer ReturnSerializer()
 		{
 			var serializer = new JsonSerializer();
 			serializer.Formatting = Formatting.Indented;
@@ -46,6 +60,7 @@ namespace SimpleSoundboard.Models.Base
 			{
 				serializer.Converters.Add(converter);
 			}
+			serializer.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
 			return serializer;
 		}
 

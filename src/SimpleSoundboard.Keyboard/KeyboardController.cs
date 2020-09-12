@@ -16,6 +16,7 @@ namespace SimpleSoundboard.Keyboard
 		private RawInput.RawInput rawInput;
 		private readonly List<Keys> keyBuffer;
 		private (List<Keys>, Action) priorityAction;
+		private bool paused;
 
 		public KeyboardController(int maxCombinationLength = 3)
 		{
@@ -24,6 +25,15 @@ namespace SimpleSoundboard.Keyboard
 			keyBuffer=new List<Keys>(maxCombinationLength);
 		}
 
+		public void Pause()
+		{
+			paused = true;
+		}
+
+		public void Continue()
+		{
+			paused = false;
+		}
 
 		private void MatchKeys(string keyboardName)
 		{
@@ -60,6 +70,11 @@ namespace SimpleSoundboard.Keyboard
 		{
 			priorityAction = (keys.ToList(), action);
 			return this;
+		}
+
+		public void ClearKeyActions()
+		{
+			keyboardKeyMap.Clear();
 		}
 
 		public void RegisterKeyAction(IEnumerable<Keys> keys, Action action, string keyboard = null)
@@ -102,25 +117,22 @@ namespace SimpleSoundboard.Keyboard
 
 		private void KeyReleased(RawInputEventArg rawInputEventArg)
 		{
+			if (paused) return;
 			if (MatchPriorityKeys())
 			{
 				MatchKeys(rawInputEventArg.KeyPressEvent.Name);
 			}
-
+			
 			if (keyBuffer.Any(x=>x == rawInputEventArg.KeyCode))
 			{
 				keyBuffer.Remove(rawInputEventArg.KeyCode);
 			}
 		}
 
-		
-
 		private void KeyPressed(RawInputEventArg rawInputEventArg)
 		{
 			if (keyBuffer.Count < maxCombinationLength && keyBuffer.All(x => x != rawInputEventArg.KeyCode))
 				keyBuffer.Add(rawInputEventArg.KeyCode);
 		}
-
-
 	}
 }

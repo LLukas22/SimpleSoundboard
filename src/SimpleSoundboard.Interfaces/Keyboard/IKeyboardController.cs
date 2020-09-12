@@ -9,5 +9,8 @@ namespace SimpleSoundboard.Interfaces.Keyboard
 		void RegisterKeyAction(IEnumerable<Keys> keys, Action action, string keyboard = null);
 		IKeyboardController BindToForm(Form form, bool captureOnlyInForeground = false);
 		IKeyboardController RegisterPriorityAction(IEnumerable<Keys> keys, Action action);
+		void ClearKeyActions();
+		void Continue();
+		void Pause();
 	}
 }

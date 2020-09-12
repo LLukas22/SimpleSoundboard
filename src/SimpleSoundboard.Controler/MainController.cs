@@ -1,4 +1,5 @@
 ﻿
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -59,36 +60,59 @@ namespace SimpleSoundboard.Controller
 			KeyboardController
 				.BindToForm(this.SpecificView as Form)
 				.RegisterPriorityAction(activeApplicationSettings.StopKeys, Stop);
+
+			UpdateKeyboardController();
 			return base.Initialize();
 		}
 
+		public void UpdateKeyboardController()
+		{
+			KeyboardController.ClearKeyActions();
+			foreach (var model in RepositoryManager
+				.Get<IAudioEntryModel>(typeof(IAudioEntryModel)).GetDictionary().Values)
+			{
+				KeyboardController.RegisterKeyAction(model.KeyBinding, ()=>Play(model), string.IsNullOrEmpty(model.KeyboardName)?null:model.KeyboardName);
+			}
+		}
 
 		public void UpdateDataSource()
 		{
-			//SpecificView.GridBindingSource = new BindingList<IAudioEntryModel>(RepositoryManager
-			//	.Get<IAudioEntryModel>(typeof(IAudioEntryModel)).GetDictionary().Values.ToList());
 			SpecificView.RefreshGrid(RepositoryManager
 				.Get<IAudioEntryModel>(typeof(IAudioEntryModel)).GetDictionary().Values.ToList());
-
 		}
 
 		public void UpdateOutputDevice(int outputDevice, string value)
 		{
+			NAudioController.Stop();
 			activeApplicationSettings.OutputDevices[outputDevice] = value;
 			NAudioController.RegisterOutputDevice(outputDevice, activeApplicationSettings.OutputDevices[outputDevice]);
-			
 		}
-
-
 
 		public void Save()
 		{
 			RepositoryManager.Save();
 		}
 
-		public void Play()
+		public void Play(Guid id)
 		{
-			NAudioController.Play(@"C:\Users\Lukas\Downloads\and-his-name-is-john-cena-1.mp3");
+			if (id == Guid.Empty) return;
+			if (RepositoryManager.Get<IAudioEntryModel>(typeof(IAudioEntryModel)).GetDictionary().ContainsKey(id))
+			{
+				Play(RepositoryManager.Get<IAudioEntryModel>(typeof(IAudioEntryModel)).GetDictionary()[id]);
+			}
+		}
+
+		private void Play(IAudioEntryModel model)
+		{
+			try
+			{
+				NAudioController.Play(model.FilePath, model.Volume);
+			}
+			catch (Exception exc)
+			{
+				CustomMetroMessageBox.Show(this.SpecificView as Form, $"Encountered Exception: '{exc.Message}'", "Error",
+					MessageBoxButtons.OK, MessageBoxIcon.Error);
+			}
 		}
 
 		public void Stop()
@@ -104,6 +128,7 @@ namespace SimpleSoundboard.Controller
 
 		public void OpenSettings()
 		{
+			KeyboardController.Pause();
 			var settingsController = (ISettingsController)ControllerFactory.Create(typeof(ISettingsController));
 			settingsController.BindingData(activeApplicationSettings).Initialize().ShowDialogue(this);
 			SpecificView.SetStopButtonText(activeApplicationSettings.StopKeys);
@@ -112,22 +137,36 @@ namespace SimpleSoundboard.Controller
 			StyleManager.Update();
 			this.SpecificView.ApplyStyleManager();
 			this.SpecificView.Refresh();
-			KeyboardController.RegisterPriorityAction(activeApplicationSettings.StopKeys, Stop);
+			KeyboardController.RegisterPriorityAction(activeApplicationSettings.StopKeys, Stop).Continue();
 		}
 
 		public void Add()
 		{
-			var newAudioEntry = new AudioEntryModel();
-			var audioSettingsController = (IAudioController)ControllerFactory.Create(typeof(IAudioController));
-			audioSettingsController.BindingData(newAudioEntry).Initialize().ShowDialogue(this);
-			RepositoryManager.Get<IAudioEntryModel>(typeof(IAudioEntryModel)).Add(newAudioEntry);
-			UpdateDataSource();
+			OpenAudioView(new AudioEntryModel());
 		}
 
-		public void Edit()
+		public void Edit(Guid id)
 		{
-
+			if (id == Guid.Empty) return;
+			if (RepositoryManager.Get<IAudioEntryModel>(typeof(IAudioEntryModel)).GetDictionary().ContainsKey(id))
+			{
+				OpenAudioView(RepositoryManager.Get<IAudioEntryModel>(typeof(IAudioEntryModel)).GetDictionary()[id]);
+			}
 		}
+
+		private void OpenAudioView(IAudioEntryModel model)
+		{
+			KeyboardController.Pause();
+			var audioSettingsController = (IAudioController)ControllerFactory.Create(typeof(IAudioController));
+			if (audioSettingsController.BindingData(model).Initialize().ShowDialogue(this) == DialogResult.OK)
+			{
+				RepositoryManager.Get<IAudioEntryModel>(typeof(IAudioEntryModel)).Add(model);
+				UpdateDataSource();
+				UpdateKeyboardController();
+			}
+			KeyboardController.Continue();
+		}
+
 		public void OnClosing(CancelEventArgs cancelEventArgs)
 		{
 			if (RepositoryManager.Values.Any(x=>x.IsDirty))
@@ -144,6 +183,13 @@ namespace SimpleSoundboard.Controller
 						break;
 				}
 			}
+		}
+
+		public void Delete(Guid id)
+		{
+			if (id == Guid.Empty) return;
+			RepositoryManager.Get<IAudioEntryModel>(typeof(IAudioEntryModel)).Delete(id);
+			UpdateDataSource();
 		}
 	}
 }

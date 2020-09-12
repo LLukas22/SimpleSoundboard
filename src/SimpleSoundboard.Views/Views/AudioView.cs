@@ -1,14 +1,18 @@
 ﻿
 using System;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using MetroFramework.Components;
+using SimpleSoundboard.Interfaces.Controller;
 using SimpleSoundboard.Interfaces.Models.Models;
 using SimpleSoundboard.Interfaces.Views;
+using SimpleSoundboard.Keyboard;
 using SimpleSoundboard.NameService.Models;
 using SimpleSoundboard.Views.Base;
 using SimpleSoundboard.Views.MessageBox;
+using static SimpleSoundboard.NameService.NAudio.SupportedAudioFormats;
 
 namespace SimpleSoundboard.Views.Views
 {
@@ -16,7 +20,7 @@ namespace SimpleSoundboard.Views.Views
 	{
 		private IAudioEntryModel clone;
 		private IAudioEntryModel original;
-
+		
 		public AudioView(MetroStyleManager styleManager):base(styleManager)
 		{
 			InitializeComponent();
@@ -53,7 +57,11 @@ namespace SimpleSoundboard.Views.Views
 
 		private void Btn_browseOnClick(object? sender, EventArgs e)
 		{
-			OpenFileDialog openFileDialog = new OpenFileDialog {Title = "Browse Audio File"};
+			OpenFileDialog openFileDialog = new OpenFileDialog
+			{
+				Title = "Browse Audio File",
+				Filter = $"Audio Files ({CompleteFilter})| {CompleteFilter}"
+			};
 			if (openFileDialog.ShowDialog() == DialogResult.OK)
 			{
 				this.customMetroTextBox_File.Text = openFileDialog.FileName;
@@ -71,7 +79,8 @@ namespace SimpleSoundboard.Views.Views
 					case DialogResult.No:
 						break;
 					case DialogResult.Yes:
-						Save();
+						if(!Save())
+							e.Cancel = true;
 						break;
 					case DialogResult.Cancel:
 						e.Cancel = true;
@@ -81,9 +90,6 @@ namespace SimpleSoundboard.Views.Views
 			base.OnClosing(e);
 		}
 
-		
-		
-
 		private void Btn_CancelOnClick(object? sender, EventArgs e)
 		{
 			this.Close();
@@ -91,18 +97,47 @@ namespace SimpleSoundboard.Views.Views
 
 		private void Btn_OkOnClick(object? sender, EventArgs e)
 		{
-			Save();
-			this.Close();
+			if(Save())
+				this.Close();
 		}
 
-		private void Save()
+		private bool Save()
 		{
+			if (!Validate()) return false;
 			original.Volume = clone.Volume;
 			original.FilePath = clone.FilePath;
 			original.KeyBinding = clone.KeyBinding;
 			original.UseSpecificKeyboard = clone.UseSpecificKeyboard;
 			original.KeyboardName = clone.KeyboardName;
 			clone.SetEntityState(EntityState.None);
+			DialogResult = DialogResult.OK;
+			return true;
+		}
+
+		private new bool Validate()
+		{
+			if (!File.Exists(clone.FilePath))
+			{
+				CustomMetroMessageBox.Show(this, $"File {clone.FilePath} does not Exist!", "Error",
+					MessageBoxButtons.OK);
+				return false;
+			}
+
+			if (clone.KeyBinding == null || clone.KeyBinding.Count < 0)
+			{
+				CustomMetroMessageBox.Show(this, $"You must assign a KeyCombo!", "Error",
+					MessageBoxButtons.OK);
+				return false;
+			}
+
+			if (!(controller as IAudioController).ValidateKeyCombo(clone.KeyBinding))
+			{
+				CustomMetroMessageBox.Show(this, $"There already exists an Entry with KeyCombo {clone.KeyBinding.ToStringAdded()}", "Error",
+					MessageBoxButtons.OK);
+				return false;
+			}
+
+			return true;
 		}
 	}
 }

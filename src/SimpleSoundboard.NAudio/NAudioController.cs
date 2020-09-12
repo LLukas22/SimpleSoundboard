@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Threading;
 using NAudio.Gui;
 using NAudio.Wave;
 using SimpleSoundboard.NameService.NAudio;
@@ -66,6 +68,11 @@ namespace SimpleSoundboard.NAudio
 			if (string.IsNullOrEmpty(audioFile))
 			{
 				throw new ArgumentException($"[{this.GetType().Name}] AudioFile can't be empty!");
+			}
+
+			if (!File.Exists(audioFile))
+			{
+				throw new ArgumentException($"[{this.GetType().Name}] Cant find AudioFile {audioFile}!");
 			}
 
 			foreach (var controller in outStreamController)
