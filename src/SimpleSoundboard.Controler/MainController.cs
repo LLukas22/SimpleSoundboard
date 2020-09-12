@@ -190,7 +190,6 @@ namespace SimpleSoundboard.Controller
 				UpdateDataSource();
 				UpdateKeyboardController();
 			}
-
 			KeyboardController.Continue();
 		}
 	}
