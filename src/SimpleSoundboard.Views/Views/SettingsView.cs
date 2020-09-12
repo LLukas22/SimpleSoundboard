@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using MetroFramework.Components;
+using SimpleSoundboard.Interfaces.Controller;
 using SimpleSoundboard.Interfaces.Models.Models;
 using SimpleSoundboard.Interfaces.Views;
 using SimpleSoundboard.NameService.Models;
@@ -23,29 +24,41 @@ namespace SimpleSoundboard.Views.Views
 			InitializeComponent();
 		}
 
+		public void BindData(ref IApplicationSettingsModel original, IApplicationSettingsModel clone)
+		{
+			this.original = original;
+			this.clone = clone;
+			keyComboControl.Initialize(this.clone.StopKeys);
+			metroComboBox_Color.DataSource = Enum.GetValues(typeof(ApplicationAccentColor));
+			metroComboBox_Style.DataSource = Enum.GetValues(typeof(ApplicationStyle));
+			metroComboBox_Style.SelectedItem = clone.Style;
+			metroComboBox_Color.SelectedItem = clone.AccentColor;
+		}
+
 		protected override void Subscribe()
 		{
-			this.btn_Ok.Click += Btn_OkOnClick;
-			this.btn_Cancel.Click += Btn_CancelOnClick;
-			this.btn_OpenFolder.Click += Btn_OpenFolderOnClick; 
-			this.keyComboControl.OnComboChanged += (sender, args) =>
-				this.clone.StopKeys = this.keyComboControl.GetCombo().ToList();
-			this.metroComboBox_Color.SelectedValueChanged += (sender, args) =>
+			btn_Ok.Click += Btn_OkOnClick;
+			btn_Cancel.Click += Btn_CancelOnClick;
+			btn_OpenFolder.Click += Btn_OpenFolderOnClick;
+			btn_KeyboardInput.Click += (sender, args) => (controller as ISettingsController).ShowKeyboardView();
+			keyComboControl.OnComboChanged += (sender, args) =>
+				clone.StopKeys = keyComboControl.GetCombo().ToList();
+			metroComboBox_Color.SelectedValueChanged += (sender, args) =>
 				SetEnum<ApplicationAccentColor>(metroComboBox_Color.SelectedValue.ToString());
-			this.metroComboBox_Style.SelectedValueChanged += (sender, args) =>
+			metroComboBox_Style.SelectedValueChanged += (sender, args) =>
 				SetEnum<ApplicationStyle>(metroComboBox_Style.SelectedValue.ToString());
 		}
 
 		private void Btn_OpenFolderOnClick(object? sender, EventArgs e)
 		{
-			Process.Start("explorer.exe", @Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
+			Process.Start("explorer.exe", Path.Combine(
+				Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
 				"SimpleSoundboard"));
 		}
 
 		protected override void OnClosing(CancelEventArgs e)
 		{
 			if (clone.EntityState == EntityState.Modified)
-			{
 				switch (CustomMetroMessageBox.Show(this, "You Have Unsaved Changes! Save them now?", "Caution",
 					MessageBoxButtons.YesNoCancel))
 				{
@@ -58,7 +71,7 @@ namespace SimpleSoundboard.Views.Views
 						e.Cancel = true;
 						break;
 				}
-			}
+
 			base.OnClosing(e);
 		}
 
@@ -77,26 +90,15 @@ namespace SimpleSoundboard.Views.Views
 			}
 		}
 
-		public void BindData(ref IApplicationSettingsModel original, IApplicationSettingsModel clone)
-		{
-			this.original = original;
-			this.clone = clone;
-			this.keyComboControl.Initialize(this.clone.StopKeys);
-			this.metroComboBox_Color.DataSource = Enum.GetValues(typeof(ApplicationAccentColor));
-			this.metroComboBox_Style.DataSource = Enum.GetValues(typeof(ApplicationStyle));
-			this.metroComboBox_Style.SelectedItem = clone.Style;
-			this.metroComboBox_Color.SelectedItem = clone.AccentColor;
-		}
-
 		private void Btn_CancelOnClick(object? sender, EventArgs e)
 		{
-			this.Close();
+			Close();
 		}
 
 		private void Btn_OkOnClick(object? sender, EventArgs e)
 		{
 			Save();
-			this.Close();
+			Close();
 		}
 
 		private void Save()

@@ -8,7 +8,8 @@ namespace SimpleSoundboard.Models.Repositories
 {
 	public class AudioEntryRepository : AbstractBaseRepository<IAudioEntryModel>, IAudioEntryRepository
 	{
-		public AudioEntryRepository(IAudioEntryStorageManager storageManager, IRepositoryManager repositoryManager) : base(storageManager, repositoryManager)
+		public AudioEntryRepository(IAudioEntryStorageManager storageManager, IRepositoryManager repositoryManager) :
+			base(storageManager, repositoryManager)
 		{
 		}
 	}

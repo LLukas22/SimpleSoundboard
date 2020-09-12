@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using SimpleSoundboard.Keyboard.NameService;
 
+//Source https://www.codeproject.com/Articles/17123/Using-Raw-Input-from-C-to-handle-multiple-keyboard
 namespace SimpleSoundboard.Keyboard.RawInput
 {
-	// ReSharper disable FieldCanBeMadeReadOnly.Global
-
 	[StructLayout(LayoutKind.Explicit)]
 	public struct DeviceInfo
 	{

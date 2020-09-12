@@ -1,8 +1,8 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using MetroFramework.Components;
 using SimpleSoundboard.Controller.Base;
@@ -12,10 +12,10 @@ using SimpleSoundboard.Interfaces.Controller.Base;
 using SimpleSoundboard.Interfaces.Keyboard;
 using SimpleSoundboard.Interfaces.Models;
 using SimpleSoundboard.Interfaces.Models.Models;
+using SimpleSoundboard.Interfaces.NAudio;
 using SimpleSoundboard.Interfaces.Root;
 using SimpleSoundboard.Interfaces.Views;
 using SimpleSoundboard.Views.MessageBox;
-using Soundboard.Audio;
 using Soundboard.Entities;
 using Unity;
 
@@ -23,17 +23,17 @@ namespace SimpleSoundboard.Controller
 {
 	public class MainController : AbstractBaseController<IMainView>, IMainController
 	{
+		private IApplicationSettingsModel activeApplicationSettings;
+
+		public MainController(IMainView view) : base(view)
+		{
+		}
+
 		[Dependency] public INAudioController NAudioController { get; set; }
 		[Dependency] public IKeyboardController KeyboardController { get; set; }
 		[Dependency] public IRepositoryManager RepositoryManager { get; set; }
 		[Dependency] public IControllerFactory ControllerFactory { get; set; }
 		[Dependency] public MetroStyleManager StyleManager { get; set; }
-		private IApplicationSettingsModel activeApplicationSettings;
-
-		public MainController(IMainView view) : base(view)
-		{
-			
-		}
 
 		public override IController<IMainView> Initialize()
 		{
@@ -50,7 +50,7 @@ namespace SimpleSoundboard.Controller
 				.SetVolumeSliderValue(0, activeApplicationSettings.Volumes[0])
 				.SetVolumeSliderValue(1, activeApplicationSettings.Volumes[1])
 				.SetStopButtonText(activeApplicationSettings.StopKeys);
-				
+
 			NAudioController
 				.RegisterOutputDevice(0, activeApplicationSettings.OutputDevices[0])
 				.RegisterOutputDevice(1, activeApplicationSettings.OutputDevices[1])
@@ -58,27 +58,11 @@ namespace SimpleSoundboard.Controller
 				.ChangeVolume(1, activeApplicationSettings.Volumes[1]);
 
 			KeyboardController
-				.BindToForm(this.SpecificView as Form)
+				.BindToForm(SpecificView as Form)
 				.RegisterPriorityAction(activeApplicationSettings.StopKeys, Stop);
 
 			UpdateKeyboardController();
 			return base.Initialize();
-		}
-
-		public void UpdateKeyboardController()
-		{
-			KeyboardController.ClearKeyActions();
-			foreach (var model in RepositoryManager
-				.Get<IAudioEntryModel>(typeof(IAudioEntryModel)).GetDictionary().Values)
-			{
-				KeyboardController.RegisterKeyAction(model.KeyBinding, ()=>Play(model), string.IsNullOrEmpty(model.KeyboardName)?null:model.KeyboardName);
-			}
-		}
-
-		public void UpdateDataSource()
-		{
-			SpecificView.RefreshGrid(RepositoryManager
-				.Get<IAudioEntryModel>(typeof(IAudioEntryModel)).GetDictionary().Values.ToList());
 		}
 
 		public void UpdateOutputDevice(int outputDevice, string value)
@@ -97,22 +81,7 @@ namespace SimpleSoundboard.Controller
 		{
 			if (id == Guid.Empty) return;
 			if (RepositoryManager.Get<IAudioEntryModel>(typeof(IAudioEntryModel)).GetDictionary().ContainsKey(id))
-			{
 				Play(RepositoryManager.Get<IAudioEntryModel>(typeof(IAudioEntryModel)).GetDictionary()[id]);
-			}
-		}
-
-		private void Play(IAudioEntryModel model)
-		{
-			try
-			{
-				NAudioController.Play(model.FilePath, model.Volume);
-			}
-			catch (Exception exc)
-			{
-				CustomMetroMessageBox.Show(this.SpecificView as Form, $"Encountered Exception: '{exc.Message}'", "Error",
-					MessageBoxButtons.OK, MessageBoxIcon.Error);
-			}
 		}
 
 		public void Stop()
@@ -129,14 +98,14 @@ namespace SimpleSoundboard.Controller
 		public void OpenSettings()
 		{
 			KeyboardController.Pause();
-			var settingsController = (ISettingsController)ControllerFactory.Create(typeof(ISettingsController));
+			var settingsController = (ISettingsController) ControllerFactory.Create(typeof(ISettingsController));
 			settingsController.BindingData(activeApplicationSettings).Initialize().ShowDialogue(this);
 			SpecificView.SetStopButtonText(activeApplicationSettings.StopKeys);
 			StyleManager.Theme = activeApplicationSettings.Style.ToMetroTheme();
 			StyleManager.Style = activeApplicationSettings.AccentColor.ToMetroColor();
 			StyleManager.Update();
-			this.SpecificView.ApplyStyleManager();
-			this.SpecificView.Refresh();
+			SpecificView.ApplyStyleManager();
+			SpecificView.Refresh();
 			KeyboardController.RegisterPriorityAction(activeApplicationSettings.StopKeys, Stop).Continue();
 		}
 
@@ -149,29 +118,14 @@ namespace SimpleSoundboard.Controller
 		{
 			if (id == Guid.Empty) return;
 			if (RepositoryManager.Get<IAudioEntryModel>(typeof(IAudioEntryModel)).GetDictionary().ContainsKey(id))
-			{
 				OpenAudioView(RepositoryManager.Get<IAudioEntryModel>(typeof(IAudioEntryModel)).GetDictionary()[id]);
-			}
-		}
-
-		private void OpenAudioView(IAudioEntryModel model)
-		{
-			KeyboardController.Pause();
-			var audioSettingsController = (IAudioController)ControllerFactory.Create(typeof(IAudioController));
-			if (audioSettingsController.BindingData(model).Initialize().ShowDialogue(this) == DialogResult.OK)
-			{
-				RepositoryManager.Get<IAudioEntryModel>(typeof(IAudioEntryModel)).Add(model);
-				UpdateDataSource();
-				UpdateKeyboardController();
-			}
-			KeyboardController.Continue();
 		}
 
 		public void OnClosing(CancelEventArgs cancelEventArgs)
 		{
-			if (RepositoryManager.Values.Any(x=>x.IsDirty))
-			{
-				switch (CustomMetroMessageBox.Show(this.SpecificView as Form, "You Have Unsaved Changes! Save them now?", "Caution", MessageBoxButtons.YesNoCancel))
+			if (RepositoryManager.Values.Any(x => x.IsDirty))
+				switch (CustomMetroMessageBox.Show(SpecificView as Form, "You Have Unsaved Changes! Save them now?",
+					"Caution", MessageBoxButtons.YesNoCancel))
 				{
 					case DialogResult.No:
 						break;
@@ -182,7 +136,6 @@ namespace SimpleSoundboard.Controller
 						cancelEventArgs.Cancel = true;
 						break;
 				}
-			}
 		}
 
 		public void Delete(Guid id)
@@ -190,6 +143,51 @@ namespace SimpleSoundboard.Controller
 			if (id == Guid.Empty) return;
 			RepositoryManager.Get<IAudioEntryModel>(typeof(IAudioEntryModel)).Delete(id);
 			UpdateDataSource();
+		}
+
+		public void UpdateKeyboardController()
+		{
+			KeyboardController.ClearKeyActions();
+			foreach (var model in RepositoryManager
+				.Get<IAudioEntryModel>(typeof(IAudioEntryModel)).GetDictionary().Values)
+				KeyboardController.RegisterKeyAction(model.KeyBinding, () => Play(model),
+					string.IsNullOrEmpty(model.KeyboardName) ? null : model.KeyboardName);
+		}
+
+		public void UpdateDataSource()
+		{
+			SpecificView.RefreshGrid(RepositoryManager
+				.Get<IAudioEntryModel>(typeof(IAudioEntryModel)).GetDictionary().Values.ToList());
+		}
+
+		private void Play(IAudioEntryModel model)
+		{
+			try
+			{
+				NAudioController.Play(model.FilePath, model.Volume);
+			}
+			catch (Exception exc)
+			{
+				Task.Run(() =>
+				{
+					CustomMetroMessageBox.Show(SpecificView as Form, $"Encountered Exception: '{exc.Message}'", "Error",
+						MessageBoxButtons.OK, MessageBoxIcon.Error);
+				});
+			}
+		}
+
+		private void OpenAudioView(IAudioEntryModel model)
+		{
+			KeyboardController.Pause();
+			var audioSettingsController = (IAudioController) ControllerFactory.Create(typeof(IAudioController));
+			if (audioSettingsController.BindingData(model).Initialize().ShowDialogue(this) == DialogResult.OK)
+			{
+				RepositoryManager.Get<IAudioEntryModel>(typeof(IAudioEntryModel)).Add(model);
+				UpdateDataSource();
+				UpdateKeyboardController();
+			}
+
+			KeyboardController.Continue();
 		}
 	}
 }

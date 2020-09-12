@@ -1,21 +1,18 @@
-
 using System;
-using System.Media;
 using System.Windows.Forms;
-using SimpleSoundboard.Controller;
 using SimpleSoundboard.Interfaces.Controller;
 using SimpleSoundboard.Root;
 using Unity;
 
 namespace SimpleSoundboard
 {
-	static class Program
+	internal static class Program
 	{
 		/// <summary>
-		///  The main entry point for the application.
+		///     The main entry point for the application.
 		/// </summary>
 		[STAThread]
-		static void Main()
+		private static void Main()
 		{
 			var container = new UnityContainer();
 			container.RegisterInstance(container);

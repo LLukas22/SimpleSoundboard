@@ -82,6 +82,7 @@
 			this.customMetroTextBox_File.MaxLength = 32767;
 			this.customMetroTextBox_File.Name = "customMetroTextBox_File";
 			this.customMetroTextBox_File.PasswordChar = '\0';
+			this.customMetroTextBox_File.ReadOnly = true;
 			this.customMetroTextBox_File.ScrollBars = System.Windows.Forms.ScrollBars.None;
 			this.customMetroTextBox_File.SelectedText = "";
 			this.customMetroTextBox_File.SelectionLength = 0;
@@ -193,6 +194,7 @@
 			this.customMetroTextBox_Keyboard.MaxLength = 32767;
 			this.customMetroTextBox_Keyboard.Name = "customMetroTextBox_Keyboard";
 			this.customMetroTextBox_Keyboard.PasswordChar = '\0';
+			this.customMetroTextBox_Keyboard.ReadOnly = true;
 			this.customMetroTextBox_Keyboard.ScrollBars = System.Windows.Forms.ScrollBars.None;
 			this.customMetroTextBox_Keyboard.SelectedText = "";
 			this.customMetroTextBox_Keyboard.SelectionLength = 0;

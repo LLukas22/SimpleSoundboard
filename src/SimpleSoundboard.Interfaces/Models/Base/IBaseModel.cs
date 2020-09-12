@@ -7,10 +7,10 @@ namespace SimpleSoundboard.Interfaces.Models.Base
 {
 	public interface IBaseModel : INotifyPropertyChanged
 	{
-		[JsonIgnore]
-		EntityState EntityState { get; }
-		[JsonIgnore]
-		Guid Id { get; set; }
+		[JsonIgnore] EntityState EntityState { get; }
+
+		[JsonIgnore] Guid Id { get; set; }
+
 		event PropertyChangedEventHandler PropertyChanged;
 		void SetEntityState(EntityState entityState);
 		public IBaseModel Clone();

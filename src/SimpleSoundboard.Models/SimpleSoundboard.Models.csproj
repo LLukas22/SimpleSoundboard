@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SimpleSoundboard.Interfaces\SimpleSoundboard.Interfaces.csproj" />
+    <ProjectReference Include="..\SimpleSoundboard.Keyboard\SimpleSoundboard.Keyboard.csproj" />
     <ProjectReference Include="..\SimpleSoundboard.NameService\SimpleSoundboard.NameService.csproj" />
   </ItemGroup>
 

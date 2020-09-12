@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
-using NAudio.Gui;
 
-namespace Soundboard.Audio
+namespace SimpleSoundboard.Interfaces.NAudio
 {
 	public interface INAudioController
 	{

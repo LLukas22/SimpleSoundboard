@@ -1,5 +1,4 @@
-﻿
-using SimpleSoundboard.Interfaces.Root.Base;
+﻿using SimpleSoundboard.Interfaces.Root.Base;
 using Unity;
 
 namespace SimpleSoundboard.Root.Base

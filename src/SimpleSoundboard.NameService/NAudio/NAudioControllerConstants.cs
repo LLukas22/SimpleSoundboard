@@ -1,11 +1,9 @@
-﻿using System;
-
-namespace SimpleSoundboard.NameService.NAudio
+﻿namespace SimpleSoundboard.NameService.NAudio
 {
-	public static  class NAudioControllerConstants
+	public static class NAudioControllerConstants
 	{
 		public const string SoundMapper = "SoundMapper (Auto)";
 		public const string NoneDevice = "None";
-		public const int NoneDeviceId = Int32.MinValue;
+		public const int NoneDeviceId = int.MinValue;
 	}
 }

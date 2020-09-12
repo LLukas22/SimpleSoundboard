@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
@@ -9,21 +8,22 @@ namespace SimpleSoundboard.Views.Controls
 {
 	public class KeyComboControl : CustomMetroTextBox
 	{
-		public int ComboLength { get; set; } = 3;
-		private List<Keys> keyCombo;
-
 		public delegate void ComboChangedHandler(object sender, EventArgs e);
-		public event ComboChangedHandler OnComboChanged;
+
+		private List<Keys> keyCombo;
 
 		public KeyComboControl()
 		{
-			this.keyCombo = new List<Keys>();
+			keyCombo = new List<Keys>();
 			ReadOnly = true;
 			FontSize = MetroTextBoxSize.Medium;
 			KeyDown += OnKeyDown;
 			var toolTip = new ToolTip();
 			toolTip.SetToolTip(this, "Focus this and Start Typing (ESC to Clear Selection)");
 		}
+
+		public int ComboLength { get; set; } = 3;
+		public event ComboChangedHandler OnComboChanged;
 
 		public void Initialize(IEnumerable<Keys> keyCombo)
 		{
@@ -36,7 +36,7 @@ namespace SimpleSoundboard.Views.Controls
 		{
 			if (keyCombo.Any(x => x == e.KeyCode))
 				return;
-			
+
 			if (e.KeyCode == Keys.Escape)
 			{
 				keyCombo.Clear();
@@ -50,20 +50,19 @@ namespace SimpleSoundboard.Views.Controls
 				keyCombo.Remove(keyCombo.First());
 				keyCombo.Add(e.KeyCode);
 			}
+
 			RefreshText();
-			OnComboChanged?.Invoke(this,null);
+			OnComboChanged?.Invoke(this, null);
 		}
 
 		private void RefreshText()
 		{
 			Text = string.Empty;
-			for (int i = 0; i < keyCombo.Count; i++)
-			{
+			for (var i = 0; i < keyCombo.Count; i++)
 				if (i == keyCombo.Count - 1)
 					Text += $"{keyCombo[i]}";
 				else
 					Text += $"{keyCombo[i]} + ";
-			}
 		}
 
 		public IEnumerable<Keys> GetCombo()

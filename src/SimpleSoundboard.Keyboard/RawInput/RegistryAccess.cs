@@ -1,5 +1,6 @@
 ﻿using Microsoft.Win32;
 
+//Source https://www.codeproject.com/Articles/17123/Using-Raw-Input-from-C-to-handle-multiple-keyboard
 namespace SimpleSoundboard.Keyboard.RawInput
 {
 	internal static class RegistryAccess
@@ -12,8 +13,8 @@ namespace SimpleSoundboard.Keyboard.RawInput
 			var subClassCode = split[1]; // PNP0303 (SubClass code)
 			var protocolCode = split[2]; // 3&13c0b0c5&0 (Protocol code)
 
-			return Registry.LocalMachine.OpenSubKey(string.Format(@"System\CurrentControlSet\Enum\{0}\{1}\{2}",
-				classCode, subClassCode, protocolCode));
+			return Registry.LocalMachine.OpenSubKey(
+				$@"System\CurrentControlSet\Enum\{classCode}\{subClassCode}\{protocolCode}");
 		}
 
 		internal static string GetClassType(string classGuid)

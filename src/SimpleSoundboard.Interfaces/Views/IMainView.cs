@@ -10,10 +10,10 @@ namespace SimpleSoundboard.Interfaces.Views
 	{
 		object OutputDevice1DataSource { get; set; }
 		object OutputDevice2DataSource { get; set; }
-		IMainView SetOutputDevice2(string value);
-		IMainView SetOutputDevice1(string value);
 		VolumeSlider VolumeSlider1 { get; }
 		VolumeSlider VolumeSlider2 { get; }
+		IMainView SetOutputDevice2(string value);
+		IMainView SetOutputDevice1(string value);
 		IMainView SetVolumeSliderValue(int outputDevice, float value);
 		IMainView SetStopButtonText(List<Keys> combo);
 		IMainView RefreshGrid(List<IAudioEntryModel> audioEntries);

@@ -1,17 +1,13 @@
-﻿
-
-using System.Diagnostics;
-using System.Windows.Forms;
-using MetroFramework;
+﻿using System.Windows.Forms;
 
 namespace SimpleSoundboard.Views.MessageBox
 {
 	public class CustomMetroMessageBoxProperties
 	{
-		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private CustomMetroMessageBoxControl _owner;
-
-		public CustomMetroMessageBoxProperties(CustomMetroMessageBoxControl owner) => this._owner = owner;
+		public CustomMetroMessageBoxProperties(CustomMetroMessageBoxControl owner)
+		{
+			Owner = owner;
+		}
 
 		public MessageBoxButtons Buttons { get; set; }
 
@@ -21,9 +17,8 @@ namespace SimpleSoundboard.Views.MessageBox
 
 		public string Message { get; set; }
 
-		public CustomMetroMessageBoxControl Owner => this._owner;
+		public CustomMetroMessageBoxControl Owner { get; }
 
 		public string Title { get; set; }
-
 	}
 }

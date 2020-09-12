@@ -1,38 +1,34 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Windows.Forms;
-using System.Xml;
+﻿using System.Linq;
 using SimpleSoundboard.Controller.Base;
 using SimpleSoundboard.Interfaces.Controller;
 using SimpleSoundboard.Interfaces.Controller.Base;
+using SimpleSoundboard.Interfaces.Keyboard;
 using SimpleSoundboard.Interfaces.Models;
 using SimpleSoundboard.Interfaces.Models.Models;
 using SimpleSoundboard.Interfaces.Views;
-using SimpleSoundboard.Keyboard;
 using Unity;
 
 namespace SimpleSoundboard.Controller
 {
-	public class AudioController : AbstractModelController<IAudioView,IAudioEntryModel>, IAudioController
+	public class AudioController : AbstractModelController<IAudioView, IAudioEntryModel>, IAudioController
 	{
-		[Dependency] public IRepositoryManager RepositoryManager { get; set; }
-
 		public AudioController(IAudioView view) : base(view)
 		{
-
 		}
+
+		[Dependency] public IRepositoryManager RepositoryManager { get; set; }
+		[Dependency] public IKeyboardController KeyboardController { get; set; }
 
 		public override IController<IAudioView> Initialize()
 		{
-			SpecificView.BindData(ref model, clone);
+			SpecificView.WithKeyboardController(KeyboardController).BindData(ref model, clone);
 			return base.Initialize();
 		}
 
-		public bool ValidateKeyCombo(List<Keys> keyCombo)
+		public IAudioEntryModel ValidateKeyCombo(IAudioEntryModel model)
 		{
-			if (RepositoryManager.Get<IAudioEntryModel>(typeof(IAudioEntryModel)).GetDictionary().Values
-				.Any(x => x.KeyBinding.CustomEquals(keyCombo))) return false;
-			return true;
+			return RepositoryManager.Get<IAudioEntryModel>(typeof(IAudioEntryModel)).GetDictionary().Values
+				.FirstOrDefault(x => x.Equals(model));
 		}
 	}
 }

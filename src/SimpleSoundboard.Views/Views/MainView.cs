@@ -1,7 +1,5 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.ComponentModel;
 using System.IO;
 using System.Windows.Forms;
@@ -26,9 +24,73 @@ namespace SimpleSoundboard.Views.Views
 
 		public override void ApplyStyleManager()
 		{
-			this.VolumeSliderOutput1.WithStyleManager(ref styleManager);
-			this.VolumeSliderOutput2.WithStyleManager(ref styleManager);
+			VolumeSliderOutput1.WithStyleManager(ref styleManager);
+			VolumeSliderOutput2.WithStyleManager(ref styleManager);
 			base.ApplyStyleManager();
+		}
+
+		public object OutputDevice1DataSource
+		{
+			get => metroComboBox__OutputDevice1.DataSource;
+			set => metroComboBox__OutputDevice1.DataSource = value;
+		}
+
+		public object OutputDevice2DataSource
+		{
+			get => metroComboBox_OutputDevice2.DataSource;
+			set => metroComboBox_OutputDevice2.DataSource = value;
+		}
+
+		public VolumeSlider VolumeSlider1 => VolumeSliderOutput1;
+		public VolumeSlider VolumeSlider2 => VolumeSliderOutput2;
+
+		public IMainView RefreshGrid(List<IAudioEntryModel> audioEntries)
+		{
+			InitializeGrid();
+			metroGrid1.Rows.Clear();
+			audioEntries.Sort((x, y) =>
+			{
+				if (x.KeyBinding.Count > y.KeyBinding.Count) return 1;
+				if (x.KeyBinding.Count < y.KeyBinding.Count) return -1;
+				for (var i = 0; i < x.KeyBinding.Count; i++)
+				{
+					var result = x.KeyBinding[i].CompareTo(y.KeyBinding[i]);
+					if (result != 0) return result;
+				}
+
+				return 0;
+			});
+			foreach (var audioEntry in audioEntries)
+				metroGrid1.Rows.Add(Path.GetFileNameWithoutExtension(audioEntry.FilePath),
+					audioEntry.KeyBinding.ToStringAdded(), audioEntry.Volume, audioEntry.Id);
+			return this;
+		}
+
+		public IMainView SetStopButtonText(List<Keys> combo)
+		{
+			btn_Stop.Text = $@"Stop{Environment.NewLine}{combo.ToStringAdded()}";
+			return this;
+		}
+
+		public IMainView SetOutputDevice1(string value)
+		{
+			SetComboBoxValue(metroComboBox__OutputDevice1, value);
+			return this;
+		}
+
+		public IMainView SetOutputDevice2(string value)
+		{
+			SetComboBoxValue(metroComboBox_OutputDevice2, value);
+			return this;
+		}
+
+		public IMainView SetVolumeSliderValue(int outputDevice, float value)
+		{
+			if (outputDevice == 0)
+				VolumeSliderOutput1.Volume = value;
+			else
+				VolumeSliderOutput2.Volume = value;
+			return this;
 		}
 
 		private void InitializeGrid()
@@ -45,83 +107,34 @@ namespace SimpleSoundboard.Views.Views
 			metroGrid1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
 		}
 
-		public object OutputDevice1DataSource
-		{
-			get => this.metroComboBox__OutputDevice1.DataSource;
-			set => this.metroComboBox__OutputDevice1.DataSource = value;
-
-		}
-
-		public object OutputDevice2DataSource
-		{
-			get => this.metroComboBox_OutputDevice2.DataSource;
-			set => this.metroComboBox_OutputDevice2.DataSource = value;
-		}
-
-		public VolumeSlider VolumeSlider1 => this.VolumeSliderOutput1;
-		public VolumeSlider VolumeSlider2 => this.VolumeSliderOutput2;
-
 		protected override void Subscribe()
 		{
-			this.btn_Add.Click += (sender, args) => (controller as IMainController)?.Add();
-			this.btn_Delete.Click += (sender, args) =>
-				(controller as IMainController)?.Delete(metroGrid1.SelectedRows.Count > 0 ? (Guid) metroGrid1.SelectedRows[0]?.Cells["Id"]?.Value : Guid.Empty);
-			this.btn_Play.Click += (sender, args) => (controller as IMainController)?.Play(metroGrid1.SelectedRows.Count > 0 ? (Guid)metroGrid1.SelectedRows[0]?.Cells["Id"]?.Value : Guid.Empty);
-			this.btn_Save.Click += (sender, args) => (controller as IMainController)?.Save();
-			this.btn_Settings.Click += (sender, args) => (controller as IMainController)?.OpenSettings();
-			this.btn_Stop.Click += (sender, args) => (controller as IMainController)?.Stop();
-			this.metroComboBox__OutputDevice1.SelectedValueChanged += (sender, args) =>
+			btn_Add.Click += (sender, args) => (controller as IMainController)?.Add();
+			btn_Delete.Click += (sender, args) =>
+				(controller as IMainController)?.Delete(metroGrid1.SelectedRows.Count > 0
+					? (Guid) metroGrid1.SelectedRows[0]?.Cells["Id"]?.Value
+					: Guid.Empty);
+			btn_Play.Click += (sender, args) => (controller as IMainController)?.Play(metroGrid1.SelectedRows.Count > 0
+				? (Guid) metroGrid1.SelectedRows[0]?.Cells["Id"]?.Value
+				: Guid.Empty);
+			btn_Save.Click += (sender, args) => (controller as IMainController)?.Save();
+			btn_Settings.Click += (sender, args) => (controller as IMainController)?.OpenSettings();
+			btn_Stop.Click += (sender, args) => (controller as IMainController)?.Stop();
+			metroComboBox__OutputDevice1.SelectedValueChanged += (sender, args) =>
 				(controller as IMainController)?.UpdateOutputDevice(0,
-					(string)this.metroComboBox__OutputDevice1.SelectedValue);
-			this.metroComboBox_OutputDevice2.SelectedValueChanged += (sender, args) =>
+					(string) metroComboBox__OutputDevice1.SelectedValue);
+			metroComboBox_OutputDevice2.SelectedValueChanged += (sender, args) =>
 				(controller as IMainController)?.UpdateOutputDevice(1,
-					(string) this.metroComboBox_OutputDevice2.SelectedValue);
-			this.VolumeSliderOutput1.VolumeChanged += (sender, args) => (controller as IMainController)?.ChangeVolume(0, VolumeSliderOutput1.Volume);
-			this.VolumeSliderOutput2.VolumeChanged += (sender, args) => (controller as IMainController)?.ChangeVolume(1, VolumeSliderOutput2.Volume);
-			this.metroGrid1.DoubleClick += (sender, args) =>
-				(controller as IMainController)?.Edit(metroGrid1.SelectedRows.Count > 0 ? (Guid)metroGrid1.SelectedRows[0]?.Cells["Id"]?.Value : Guid.Empty);
+					(string) metroComboBox_OutputDevice2.SelectedValue);
+			VolumeSliderOutput1.VolumeChanged += (sender, args) =>
+				(controller as IMainController)?.ChangeVolume(0, VolumeSliderOutput1.Volume);
+			VolumeSliderOutput2.VolumeChanged += (sender, args) =>
+				(controller as IMainController)?.ChangeVolume(1, VolumeSliderOutput2.Volume);
+			metroGrid1.DoubleClick += (sender, args) =>
+				(controller as IMainController)?.Edit(metroGrid1.SelectedRows.Count > 0
+					? (Guid) metroGrid1.SelectedRows[0]?.Cells["Id"]?.Value
+					: Guid.Empty);
 			base.Subscribe();
-		}
-
-		public IMainView RefreshGrid(List<IAudioEntryModel> audioEntries)
-		{
-			InitializeGrid();
-			metroGrid1.Rows.Clear();
-			audioEntries.Sort((x, y) =>
-			{
-				if (x.KeyBinding.Count > y.KeyBinding.Count) return 1;
-				if (x.KeyBinding.Count < y.KeyBinding.Count) return -1;
-				for (int i = 0; i < x.KeyBinding.Count; i++)
-				{
-					var result = x.KeyBinding[i].CompareTo(y.KeyBinding[i]);
-					if (result != 0) return result;
-				}
-				return 0;
-			});
-			foreach (var audioEntry in audioEntries)
-			{
-				metroGrid1.Rows.Add(Path.GetFileNameWithoutExtension(audioEntry.FilePath),
-					audioEntry.KeyBinding.ToStringAdded(), audioEntry.Volume, audioEntry.Id);
-			}
-			return this;
-		}
-
-		public IMainView SetStopButtonText(List<Keys> combo)
-		{
-			this.btn_Stop.Text = $@"Stop{Environment.NewLine}{combo.ToStringAdded()}";
-			return this;
-		}
-
-		public IMainView SetOutputDevice1(string value)
-		{
-			SetComboBoxValue(this.metroComboBox__OutputDevice1, value);
-			return this;
-		}
-
-		public IMainView SetOutputDevice2(string value)
-		{
-			SetComboBoxValue(this.metroComboBox_OutputDevice2, value);
-			return this;
 		}
 
 		private void SetComboBoxValue(MetroComboBox comboBox, string value)
@@ -138,28 +151,13 @@ namespace SimpleSoundboard.Views.Views
 			}
 		}
 
-		public IMainView SetVolumeSliderValue(int outputDevice, float value)
-		{
-			if (outputDevice == 0)
-			{
-				this.VolumeSliderOutput1.Volume = value;
-			}
-			else
-			{
-				this.VolumeSliderOutput2.Volume = value;
-			}
-			return this;
-		}
-
 		private void Btn_DeleteOnClick(object? sender, EventArgs e)
 		{
-			
 		}
 
 		protected override void OnClosing(CancelEventArgs e)
 		{
 			(controller as IMainController)?.OnClosing(e);
 		}
-
 	}
 }

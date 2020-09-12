@@ -5,30 +5,36 @@ using Newtonsoft.Json;
 using SimpleSoundboard.Interfaces.Models.Base;
 using SimpleSoundboard.NameService.Models;
 
-
 namespace Soundboard.Entities
 {
 	public abstract class AbstractBaseModel : IBaseModel
 	{
-		[JsonIgnore]
-		public EntityState EntityState { get; protected set; }
-
 		private Guid id;
+
+		[JsonIgnore] public EntityState EntityState { get; protected set; }
+
 		[JsonIgnore]
 		public Guid Id
 		{
 			get
 			{
-				if (id == Guid.Empty)
-				{
-					id = Guid.NewGuid();
-				}
+				if (id == Guid.Empty) id = Guid.NewGuid();
 				return id;
 			}
 			set => id = value;
 		}
 
 		public event PropertyChangedEventHandler PropertyChanged;
+
+		public void SetEntityState(EntityState entityState)
+		{
+			EntityState = entityState;
+		}
+
+		public IBaseModel Clone()
+		{
+			return (IBaseModel) MemberwiseClone();
+		}
 
 		protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
 		{
@@ -40,16 +46,6 @@ namespace Soundboard.Entities
 		{
 			OnPropertyChanged();
 			backingField = value;
-		}
-
-		public void SetEntityState(EntityState entityState)
-		{
-			this.EntityState = entityState;
-		}
-
-		public IBaseModel Clone()
-		{
-			return (IBaseModel)this.MemberwiseClone();
 		}
 	}
 }

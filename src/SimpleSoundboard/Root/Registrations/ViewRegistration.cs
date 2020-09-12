@@ -1,5 +1,4 @@
-﻿
-using SimpleSoundboard.Interfaces.Root.Base;
+﻿using SimpleSoundboard.Interfaces.Root.Base;
 using SimpleSoundboard.Interfaces.Views;
 using SimpleSoundboard.Root.Base;
 using SimpleSoundboard.Views.Views;
@@ -19,6 +18,7 @@ namespace SimpleSoundboard.Root.Registrations
 			container.RegisterType<IMainView, MainView>(new ContainerControlledLifetimeManager());
 			container.RegisterType<ISettingsView, SettingsView>();
 			container.RegisterType<IAudioView, AudioView>();
+			container.RegisterType<IKeyboardView, KeyboardView>();
 			return base.Register();
 		}
 	}

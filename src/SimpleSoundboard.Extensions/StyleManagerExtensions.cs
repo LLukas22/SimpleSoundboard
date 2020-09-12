@@ -1,6 +1,6 @@
-﻿using MetroFramework;
+﻿using System.Drawing;
+using MetroFramework;
 using SimpleSoundboard.NameService.Models;
-using System.Drawing;
 
 namespace SimpleSoundboard.Extensions
 {
@@ -15,13 +15,14 @@ namespace SimpleSoundboard.Extensions
 				case ApplicationStyle.Light:
 					return MetroThemeStyle.Light;
 			}
+
 			return MetroThemeStyle.Light;
 		}
 
 
 		public static MetroColorStyle ToMetroColor(this ApplicationAccentColor applicationAccentColor)
 		{
-			return (MetroColorStyle)applicationAccentColor;
+			return (MetroColorStyle) applicationAccentColor;
 		}
 
 
@@ -34,6 +35,7 @@ namespace SimpleSoundboard.Extensions
 				case MetroThemeStyle.Dark:
 					return Pens.AntiqueWhite;
 			}
+
 			return Pens.Black;
 		}
 
@@ -46,6 +48,7 @@ namespace SimpleSoundboard.Extensions
 				case MetroThemeStyle.Dark:
 					return Brushes.AntiqueWhite;
 			}
+
 			return Brushes.Black;
 		}
 
@@ -85,8 +88,8 @@ namespace SimpleSoundboard.Extensions
 				case MetroColorStyle.Default:
 					return Brushes.Orange;
 			}
+
 			return Brushes.Orange;
 		}
 	}
-
 }

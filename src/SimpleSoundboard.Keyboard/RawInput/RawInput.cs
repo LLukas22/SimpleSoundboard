@@ -2,9 +2,11 @@ using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
+using SimpleSoundboard.Keyboard.NameService;
 
 namespace SimpleSoundboard.Keyboard.RawInput
 {
+	//Based on https://www.codeproject.com/Articles/17123/Using-Raw-Input-from-C-to-handle-multiple-keyboard
 	public class RawInput : NativeWindow
 	{
 		private static RawKeyboard _keyboardDriver;

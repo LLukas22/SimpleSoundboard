@@ -16,7 +16,7 @@ namespace SimpleSoundboard.Root.Factories
 
 		public IController Create(Type type)
 		{
-			return (IController)container.Resolve(type);
+			return (IController) container.Resolve(type);
 		}
 	}
 }

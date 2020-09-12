@@ -6,5 +6,6 @@ namespace SimpleSoundboard.Interfaces.Controller
 {
 	public interface ISettingsController : IModelController<ISettingsView, IApplicationSettingsModel>
 	{
+		void ShowKeyboardView();
 	}
 }

@@ -8,7 +8,8 @@ using Soundboard.Entities;
 
 namespace SimpleSoundboard.Interfaces.Models.StorageManager
 {
-	public class ApplicationSettingsStorageManager : AbstractBaseStorageManager<IApplicationSettingsModel>, IApplicationSettingsStorageManager
+	public class ApplicationSettingsStorageManager : AbstractBaseStorageManager<IApplicationSettingsModel>,
+		IApplicationSettingsStorageManager
 	{
 		public ApplicationSettingsStorageManager(string path) : base(path)
 		{
@@ -17,14 +18,15 @@ namespace SimpleSoundboard.Interfaces.Models.StorageManager
 
 		protected override IApplicationSettingsModel ReturnDefault()
 		{
-			return new ApplicationSettingsModel()
+			return new ApplicationSettingsModel
 			{
 				AccentColor = ApplicationAccentColor.Orange,
 				InputDevice = null,
-				OutputDevices = new List<string>() { NAudioControllerConstants.SoundMapper, NAudioControllerConstants.NoneDevice },
-				StopKeys = new List<Keys>(){Keys.Back},
-				Style = ApplicationStyle.Dark,
-				Volumes = new List<float>(){0.5f,0.5f}
+				OutputDevices = new List<string>
+					{NAudioControllerConstants.SoundMapper, NAudioControllerConstants.NoneDevice},
+				StopKeys = new List<Keys> {Keys.Back},
+				Style = ApplicationStyle.Light,
+				Volumes = new List<float> {0.5f, 0.5f}
 			};
 		}
 	}

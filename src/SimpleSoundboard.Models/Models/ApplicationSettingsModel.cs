@@ -3,17 +3,16 @@ using System.Windows.Forms;
 using SimpleSoundboard.Interfaces.Models.Models;
 using SimpleSoundboard.NameService.Models;
 
-
 namespace Soundboard.Entities
 {
 	public class ApplicationSettingsModel : AbstractBaseModel, IApplicationSettingsModel
 	{
 		private ApplicationAccentColor accentColor;
-		private ApplicationStyle style;
 
 		private string inputDevice;
 		private List<string> outputDevices;
 		private List<Keys> stopKeys;
+		private ApplicationStyle style;
 		private List<float> volumes;
 
 
@@ -52,7 +51,5 @@ namespace Soundboard.Entities
 			get => volumes;
 			set => SetProperty(ref volumes, value);
 		}
-
-
 	}
 }

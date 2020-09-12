@@ -2,8 +2,7 @@
 
 namespace SimpleSoundboard.Views.Controls
 {
-	public partial class CustomButton : Button
+	public class CustomButton : Button
 	{
-		
 	}
 }

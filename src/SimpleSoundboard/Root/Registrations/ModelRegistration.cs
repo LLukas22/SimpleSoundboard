@@ -1,8 +1,6 @@
-﻿
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
-using MetroFramework;
 using MetroFramework.Components;
 using SimpleSoundboard.Extensions;
 using SimpleSoundboard.Interfaces.Models;
@@ -24,21 +22,17 @@ namespace SimpleSoundboard.Root.Registrations
 	{
 		public ModelRegistration(IUnityContainer container) : base(container)
 		{
-
 		}
 
 		public override IRegistration Register()
 		{
 			container.RegisterType<IRepositoryManager, RepositoryManager>(new ContainerControlledLifetimeManager());
 
-			
+
 			var settingsDirectory =
 				Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
 					"SimpleSoundboard");
-			if (!Directory.Exists(settingsDirectory))
-			{
-				Directory.CreateDirectory(settingsDirectory);
-			}
+			if (!Directory.Exists(settingsDirectory)) Directory.CreateDirectory(settingsDirectory);
 
 			//Storage Manager
 			container.RegisterType<IApplicationSettingsStorageManager, ApplicationSettingsStorageManager>(
@@ -65,9 +59,10 @@ namespace SimpleSoundboard.Root.Registrations
 			repositoryManager.Load();
 
 			var applicationSettings =
-				repositoryManager.Get<IApplicationSettingsModel>(typeof(IApplicationSettingsModel)).GetDictionary().Values.First();
-			
-			container.RegisterInstance(new MetroStyleManager()
+				repositoryManager.Get<IApplicationSettingsModel>(typeof(IApplicationSettingsModel)).GetDictionary()
+					.Values.First();
+
+			container.RegisterInstance(new MetroStyleManager
 			{
 				Theme = applicationSettings.Style.ToMetroTheme(),
 				Style = applicationSettings.AccentColor.ToMetroColor()

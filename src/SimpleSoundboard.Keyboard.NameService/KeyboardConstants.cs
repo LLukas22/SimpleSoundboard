@@ -1,4 +1,4 @@
-﻿namespace SimpleSoundboard.NameService.Keyboard
+﻿namespace SimpleSoundboard.Keyboard.NameService
 {
 	public static class KeyboardConstants
 	{

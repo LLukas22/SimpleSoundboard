@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace SimpleSoundboard.NameService.NAudio
+﻿namespace SimpleSoundboard.NameService.NAudio
 {
 	public static class SupportedAudioFormats
 	{

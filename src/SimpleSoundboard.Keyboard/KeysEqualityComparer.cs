@@ -12,7 +12,6 @@ namespace SimpleSoundboard.Keyboard
 
 		public int GetHashCode(List<Keys> obj)
 		{
-			
 			return obj.ToStringAdded().GetHashCode();
 		}
 	}

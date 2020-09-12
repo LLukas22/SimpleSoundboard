@@ -1,6 +1,7 @@
 ﻿using System;
 
-namespace SimpleSoundboard.Keyboard.RawInput
+//Source https://www.codeproject.com/Articles/17123/Using-Raw-Input-from-C-to-handle-multiple-keyboard
+namespace SimpleSoundboard.Keyboard.NameService
 {
 	public enum KeyState
 	{
@@ -22,14 +23,14 @@ namespace SimpleSoundboard.Keyboard.RawInput
 		public const int RimTypeHid = 2;
 	}
 
-	internal enum RawInputDeviceInfo : uint
+	public enum RawInputDeviceInfo : uint
 	{
 		RIDI_DEVICENAME = 0x20000007,
 		RIDI_DEVICEINFO = 0x2000000b,
 		PREPARSEDDATA = 0x20000005
 	}
 
-	internal enum BroadcastDeviceType
+	public enum BroadcastDeviceType
 	{
 		DBT_DEVTYP_OEM = 0,
 		DBT_DEVTYP_DEVNODE = 1,
@@ -40,7 +41,7 @@ namespace SimpleSoundboard.Keyboard.RawInput
 		DBT_DEVTYP_HANDLE = 6
 	}
 
-	internal enum DeviceNotification
+	public enum DeviceNotification
 	{
 		DEVICE_NOTIFY_WINDOW_HANDLE = 0x00000000, // The hRecipient parameter is a window handle
 		DEVICE_NOTIFY_SERVICE_HANDLE = 0x00000001, // The hRecipient parameter is a service status handle
@@ -52,7 +53,7 @@ namespace SimpleSoundboard.Keyboard.RawInput
 	}
 
 	[Flags]
-	internal enum RawInputDeviceFlags
+	public enum RawInputDeviceFlags
 	{
 		NONE = 0, // No flags
 

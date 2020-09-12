@@ -1,20 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Threading;
-using NAudio.Gui;
 using NAudio.Wave;
+using SimpleSoundboard.Interfaces.NAudio;
 using SimpleSoundboard.NameService.NAudio;
-using Soundboard.Audio;
 
 namespace SimpleSoundboard.NAudio
 {
 	public class NAudioController : INAudioController
 	{
-		private readonly int outputChannelCount;
 		private readonly Dictionary<int, string> mappedOutputDevices;
-		private Dictionary<string, int> outputDevices;
+		private readonly int outputChannelCount;
 		private readonly List<OutStreamController> outStreamController;
+		private Dictionary<string, int> outputDevices;
 
 		public NAudioController(int outputChannels = 2)
 		{
@@ -22,10 +20,8 @@ namespace SimpleSoundboard.NAudio
 			GetWaveOutCapabilities();
 			mappedOutputDevices = new Dictionary<int, string>(outputChannelCount);
 			outStreamController = new List<OutStreamController>(outputChannelCount);
-			for (int i = 0; i < outputChannelCount; i++)
-			{
-				outStreamController.Add(new OutStreamController(ref mappedOutputDevices,ref outputDevices,i));
-			}
+			for (var i = 0; i < outputChannelCount; i++)
+				outStreamController.Add(new OutStreamController(ref mappedOutputDevices, ref outputDevices, i));
 			outputDevices = new Dictionary<string, int>();
 		}
 
@@ -38,8 +34,9 @@ namespace SimpleSoundboard.NAudio
 			for (var n = 0; n < WaveOut.DeviceCount; n++)
 			{
 				var capability = WaveOut.GetCapabilities(n);
-				outputDevices.Add(WaveOut.GetCapabilities(n).ProductName,n);
+				outputDevices.Add(WaveOut.GetCapabilities(n).ProductName, n);
 			}
+
 			return outputDevices;
 		}
 
@@ -47,13 +44,9 @@ namespace SimpleSoundboard.NAudio
 		{
 			Stop(false);
 			if (mappedOutputDevices.ContainsKey(outputChannel))
-			{
 				mappedOutputDevices[outputChannel] = deviceName;
-			}
 			else
-			{
 				mappedOutputDevices.Add(outputChannel, deviceName);
-			}
 			return this;
 		}
 
@@ -66,18 +59,14 @@ namespace SimpleSoundboard.NAudio
 		public INAudioController Play(string audioFile, float volumeModifier = 1)
 		{
 			if (string.IsNullOrEmpty(audioFile))
-			{
-				throw new ArgumentException($"[{this.GetType().Name}] AudioFile can't be empty!");
-			}
+				throw new ArgumentException($"[{GetType().Name}] AudioFile can't be empty!");
 
 			if (!File.Exists(audioFile))
-			{
-				throw new ArgumentException($"[{this.GetType().Name}] Cant find AudioFile {audioFile}!");
-			}
+				throw new ArgumentException($"[{GetType().Name}] AudioFile {audioFile} does not Exist!");
 
 			foreach (var controller in outStreamController)
 				controller.Play(audioFile, volumeModifier);
-			
+
 			return this;
 		}
 
@@ -90,6 +79,7 @@ namespace SimpleSoundboard.NAudio
 				GC.Collect();
 				GC.WaitForPendingFinalizers();
 			}
+
 			return this;
 		}
 	}

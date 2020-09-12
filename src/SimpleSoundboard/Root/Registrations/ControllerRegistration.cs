@@ -11,7 +11,6 @@ namespace SimpleSoundboard.Root.Registrations
 	{
 		public ControllerRegistration(IUnityContainer container) : base(container)
 		{
-
 		}
 
 		public override IRegistration Register()
@@ -19,6 +18,7 @@ namespace SimpleSoundboard.Root.Registrations
 			container.RegisterType<IMainController, MainController>(new ContainerControlledLifetimeManager());
 			container.RegisterType<ISettingsController, SettingsController>();
 			container.RegisterType<IAudioController, AudioController>();
+			container.RegisterType<IKeyboardDebugController, KeyboardDebugController>();
 			return base.Register();
 		}
 	}

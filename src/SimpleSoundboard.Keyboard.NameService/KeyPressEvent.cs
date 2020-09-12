@@ -1,6 +1,7 @@
 ﻿using System;
 
-namespace SimpleSoundboard.Keyboard.RawInput
+//Source https://www.codeproject.com/Articles/17123/Using-Raw-Input-from-C-to-handle-multiple-keyboard
+namespace SimpleSoundboard.Keyboard.NameService
 {
 	public class KeyPressEvent
 	{

@@ -4,12 +4,15 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.InteropServices;
+using SimpleSoundboard.Keyboard.NameService;
 
+
+//Source https://www.codeproject.com/Articles/17123/Using-Raw-Input-from-C-to-handle-multiple-keyboard
 namespace SimpleSoundboard.Keyboard.RawInput
 {
 	public sealed class RawKeyboard
 	{
-		public delegate void DeviceEventHandler(object sender, RawInputEventArg e);
+		public delegate void DeviceEventHandler(object sender, RawInputEventArgs e);
 
 		private static InputData _rawBuffer;
 		private readonly Dictionary<IntPtr, KeyPressEvent> _deviceList = new Dictionary<IntPtr, KeyPressEvent>();
@@ -163,7 +166,7 @@ namespace SimpleSoundboard.Keyboard.RawInput
 				KeyMapper.GetKeyName(VirtualKeyCorrection(virtualKey, isE0BitSet, makeCode)).ToUpper();
 			keyPressEvent.VKey = virtualKey;
 
-			if (KeyPressed != null) KeyPressed(this, new RawInputEventArg(keyPressEvent));
+			if (KeyPressed != null) KeyPressed(this, new RawInputEventArgs(keyPressEvent));
 		}
 
 		private static int VirtualKeyCorrection(int virtualKey, bool isE0BitSet, int makeCode)
