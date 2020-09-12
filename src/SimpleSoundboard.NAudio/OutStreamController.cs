@@ -106,6 +106,15 @@ namespace SimpleSoundboard.NAudio
 			DisposeAndRemove(waveOutEvents, id);
 			DisposeAndRemove(volumeModifiers, id);
 			DisposeAndRemove(fileReaders, id);
+			if (waveOutEvents.Count == 0)
+			{
+				waveOutEvents.Clear();
+				volumeModifiers.Clear();
+				fileReaders.Clear();
+
+				GC.Collect();
+				GC.WaitForPendingFinalizers();
+			}
 		}
 
 		private void DisposeAndRemove<TType>(ConcurrentDictionary<string, TType> dictionary, string id)

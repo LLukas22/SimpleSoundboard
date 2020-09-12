@@ -122,7 +122,7 @@ namespace SimpleSoundboard.Controller
 		{
 			if (id == Guid.Empty) return;
 			if (RepositoryManager.Get<IAudioEntryModel>(typeof(IAudioEntryModel)).GetDictionary().ContainsKey(id))
-				OpenAudioView(RepositoryManager.Get<IAudioEntryModel>(typeof(IAudioEntryModel)).GetDictionary()[id]);
+				OpenAudioView(RepositoryManager.Get<IAudioEntryModel>(typeof(IAudioEntryModel)).GetDictionary()[id],false);
 		}
 
 		public void OnClosing(CancelEventArgs cancelEventArgs)
@@ -147,6 +147,8 @@ namespace SimpleSoundboard.Controller
 			if (id == Guid.Empty) return;
 			RepositoryManager.Get<IAudioEntryModel>(typeof(IAudioEntryModel)).Delete(id);
 			UpdateDataSource();
+			UpdateKeyboardController();
+
 		}
 
 		public void UpdateKeyboardController()
@@ -157,6 +159,7 @@ namespace SimpleSoundboard.Controller
 				KeyboardController.RegisterKeyAction(model.KeyBinding, () => Play(model),
 					string.IsNullOrEmpty(model.KeyboardName) ? null : model.KeyboardName);
 		}
+
 
 		public void UpdateDataSource()
 		{
@@ -180,13 +183,13 @@ namespace SimpleSoundboard.Controller
 			}
 		}
 
-		private void OpenAudioView(IAudioEntryModel model)
+		private void OpenAudioView(IAudioEntryModel model,bool add=true)
 		{
 			KeyboardController.Pause();
 			var audioSettingsController = (IAudioController) ControllerFactory.Create(typeof(IAudioController));
 			if (audioSettingsController.BindingData(model).Initialize().ShowDialogue(this) == DialogResult.OK)
 			{
-				RepositoryManager.Get<IAudioEntryModel>(typeof(IAudioEntryModel)).Add(model);
+				if(add) RepositoryManager.Get<IAudioEntryModel>(typeof(IAudioEntryModel)).Add(model);
 				UpdateDataSource();
 				UpdateKeyboardController();
 			}

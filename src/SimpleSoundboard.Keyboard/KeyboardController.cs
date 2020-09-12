@@ -115,10 +115,11 @@ namespace SimpleSoundboard.Keyboard
 		private void KeyReleased(RawInputEventArgs rawInputEventArgs)
 		{
 			OnKeyReleased?.Invoke(this, rawInputEventArgs);
-			if (paused) return;
-			if (MatchPriorityKeys()) MatchKeys(rawInputEventArgs.UniqueName);
-
-			if (keyBuffer.Any(x => x == rawInputEventArgs.KeyCode)) keyBuffer.Remove(rawInputEventArgs.KeyCode);
+			if (!paused)
+				if (MatchPriorityKeys())
+					MatchKeys(rawInputEventArgs.UniqueName);
+			if (keyBuffer.Any(x => x == rawInputEventArgs.KeyCode))
+				keyBuffer.Remove(rawInputEventArgs.KeyCode);
 		}
 
 		private void KeyPressed(RawInputEventArgs rawInputEventArgs)

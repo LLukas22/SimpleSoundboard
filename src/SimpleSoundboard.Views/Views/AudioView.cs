@@ -150,7 +150,7 @@ namespace SimpleSoundboard.Views.Views
 			}
 
 			var match = (controller as IAudioController)?.ValidateKeyCombo(clone);
-			if (match != null)
+			if (match != null && match.Id != clone.Id)
 			{
 				var message = string.Empty;
 				if (clone.UseSpecificKeyboard)
