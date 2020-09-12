@@ -105,6 +105,8 @@ namespace SimpleSoundboard.Views.Views
 			metroGrid1.Columns[3].Visible = false;
 			metroGrid1.CellBorderStyle = DataGridViewCellBorderStyle.RaisedHorizontal;
 			metroGrid1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+			metroGrid1.ScrollBars = ScrollBars.None;
+			metroGrid1.Refresh();
 		}
 
 		protected override void Subscribe()

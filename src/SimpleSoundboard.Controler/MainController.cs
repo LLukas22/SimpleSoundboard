@@ -15,6 +15,7 @@ using SimpleSoundboard.Interfaces.Models.Models;
 using SimpleSoundboard.Interfaces.NAudio;
 using SimpleSoundboard.Interfaces.Root;
 using SimpleSoundboard.Interfaces.Views;
+using SimpleSoundboard.NameService.Models;
 using SimpleSoundboard.Views.MessageBox;
 using Soundboard.Entities;
 using Unity;
@@ -69,6 +70,7 @@ namespace SimpleSoundboard.Controller
 		{
 			NAudioController.Stop();
 			activeApplicationSettings.OutputDevices[outputDevice] = value;
+			activeApplicationSettings.SetEntityState(EntityState.Modified);
 			NAudioController.RegisterOutputDevice(outputDevice, activeApplicationSettings.OutputDevices[outputDevice]);
 		}
 
@@ -92,7 +94,9 @@ namespace SimpleSoundboard.Controller
 		public void ChangeVolume(int outputDevice, float value)
 		{
 			activeApplicationSettings.Volumes[outputDevice] = value;
+			activeApplicationSettings.SetEntityState(EntityState.Modified);
 			NAudioController.ChangeVolume(outputDevice, activeApplicationSettings.Volumes[outputDevice]);
+
 		}
 
 		public void OpenSettings()
