@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Windows.Forms;
+using SimpleSoundboard.Interfaces.Logger;
 using SimpleSoundboard.Interfaces.Models.Models;
 using SimpleSoundboard.Models.Base;
 using SimpleSoundboard.NameService.Models;
@@ -11,7 +12,7 @@ namespace SimpleSoundboard.Interfaces.Models.StorageManager
 	public class ApplicationSettingsStorageManager : AbstractBaseStorageManager<IApplicationSettingsModel>,
 		IApplicationSettingsStorageManager
 	{
-		public ApplicationSettingsStorageManager(string path) : base(path)
+		public ApplicationSettingsStorageManager(string path,ILogger logger) : base(path, logger)
 		{
 			fileName = "ApplicationSettings";
 		}

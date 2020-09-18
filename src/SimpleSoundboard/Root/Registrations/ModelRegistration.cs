@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using MetroFramework.Components;
 using SimpleSoundboard.Extensions;
+using SimpleSoundboard.Interfaces.Logger;
 using SimpleSoundboard.Interfaces.Models;
 using SimpleSoundboard.Interfaces.Models.Models;
 using SimpleSoundboard.Interfaces.Models.Repositories;
@@ -11,6 +12,7 @@ using SimpleSoundboard.Interfaces.Root.Base;
 using SimpleSoundboard.Models;
 using SimpleSoundboard.Models.Repositories;
 using SimpleSoundboard.Models.StorageManager;
+using SimpleSoundboard.NameService;
 using SimpleSoundboard.Root.Base;
 using Unity;
 using Unity.Injection;
@@ -28,17 +30,11 @@ namespace SimpleSoundboard.Root.Registrations
 		{
 			container.RegisterType<IRepositoryManager, RepositoryManager>(new ContainerControlledLifetimeManager());
 
-
-			var settingsDirectory =
-				Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
-					"SimpleSoundboard");
-			if (!Directory.Exists(settingsDirectory)) Directory.CreateDirectory(settingsDirectory);
-
 			//Storage Manager
 			container.RegisterType<IApplicationSettingsStorageManager, ApplicationSettingsStorageManager>(
-				new ContainerControlledLifetimeManager(), new InjectionConstructor(settingsDirectory));
+				new ContainerControlledLifetimeManager(), new InjectionConstructor(ApplicationConstants.SettingsDirectory, container.Resolve<ILogger>()));
 			container.RegisterType<IAudioEntryStorageManager, AudioEntryStorageManager>(
-				new ContainerControlledLifetimeManager(), new InjectionConstructor(settingsDirectory));
+				new ContainerControlledLifetimeManager(), new InjectionConstructor(ApplicationConstants.SettingsDirectory, container.Resolve<ILogger>()));
 
 
 			//Repositories 

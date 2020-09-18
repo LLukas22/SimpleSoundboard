@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using Newtonsoft.Json;
+using SimpleSoundboard.Interfaces.Logger;
 using SimpleSoundboard.Interfaces.Models.Models;
 using SimpleSoundboard.Interfaces.Models.StorageManager;
 using SimpleSoundboard.Models.Base;
@@ -15,7 +16,7 @@ namespace SimpleSoundboard.Models.StorageManager
 	{
 		private const string legacyFileName = "AudioEntityList.json";
 
-		public AudioEntryStorageManager(string path) : base(path)
+		public AudioEntryStorageManager(string path, ILogger logger) : base(path, logger)
 		{
 			fileName = "AudioEntries";
 		}

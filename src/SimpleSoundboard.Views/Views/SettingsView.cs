@@ -8,6 +8,7 @@ using MetroFramework.Components;
 using SimpleSoundboard.Interfaces.Controller;
 using SimpleSoundboard.Interfaces.Models.Models;
 using SimpleSoundboard.Interfaces.Views;
+using SimpleSoundboard.NameService;
 using SimpleSoundboard.NameService.Models;
 using SimpleSoundboard.Views.Base;
 using SimpleSoundboard.Views.MessageBox;
@@ -51,9 +52,7 @@ namespace SimpleSoundboard.Views.Views
 
 		private void Btn_OpenFolderOnClick(object? sender, EventArgs e)
 		{
-			Process.Start("explorer.exe", Path.Combine(
-				Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
-				"SimpleSoundboard"));
+			Process.Start("explorer.exe", ApplicationConstants.SettingsDirectory);
 		}
 
 		protected override void OnClosing(CancelEventArgs e)

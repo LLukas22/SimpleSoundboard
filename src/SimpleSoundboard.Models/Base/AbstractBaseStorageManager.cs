@@ -1,19 +1,24 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using SimpleSoundboard.Interfaces.Logger;
 using SimpleSoundboard.Interfaces.Models.Base;
+using SimpleSoundboard.NameService.Logging;
 
 namespace SimpleSoundboard.Models.Base
 {
 	public abstract class AbstractBaseStorageManager<TModel> : IStorageManager<TModel> where TModel : class, IBaseModel
 	{
 		protected readonly string storagePath;
+		protected readonly ILogger logger;
 		protected string fileName;
 
-		protected AbstractBaseStorageManager(string path)
+		protected AbstractBaseStorageManager(string path,ILogger logger)
 		{
 			storagePath = path;
+			this.logger = logger;
 		}
 
 		protected string fullFilePath => Path.Combine(storagePath, fileName + ".json");
@@ -28,10 +33,29 @@ namespace SimpleSoundboard.Models.Base
 					using JsonReader reader = new JsonTextReader(sr);
 					return ReturnSerializer().Deserialize<IEnumerable<TModel>>(reader);
 				}
-				catch
+				catch(Exception exception)
 				{
-					//Try Legacy Deserialize
-					return LegacyLoad(fullFilePath);
+					Exception innerException = null;
+					try
+					{
+						//Try Legacy Deserialize
+						return LegacyLoad(fullFilePath);
+					}
+					catch (Exception coughtInnerException)
+					{
+						innerException = coughtInnerException;
+					}
+					finally
+					{
+						if (innerException != null)
+						{
+							logger.Log($"[{this.GetType().Name}]Failed LegacyLoad!", innerException,LogLevels.Error);
+						}
+						else
+						{
+							logger.Log($"[{this.GetType().Name}]Failed Load!", exception, LogLevels.Error);
+						}
+					}
 				}
 
 			return new List<TModel> {ReturnDefault()};
@@ -39,9 +63,17 @@ namespace SimpleSoundboard.Models.Base
 
 		public void Save(IEnumerable<TModel> models)
 		{
-			using var sw = new StreamWriter(fullFilePath);
-			using JsonWriter writer = new JsonTextWriter(sw);
-			ReturnSerializer().Serialize(writer, models);
+			try
+			{
+				using var sw = new StreamWriter(fullFilePath);
+				using JsonWriter writer = new JsonTextWriter(sw);
+				ReturnSerializer().Serialize(writer, models);
+			}
+			catch (Exception exception)
+			{
+				logger.Log($"[{this.GetType().Name}]Failed Save!", exception, LogLevels.Error);
+			}
+			
 		}
 
 		protected virtual IEnumerable<TModel> LegacyLoad(string legacyFilePath)

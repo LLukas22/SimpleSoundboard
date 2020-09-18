@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using NAudio.Wave;
+using SimpleSoundboard.Interfaces.Logger;
+using SimpleSoundboard.NameService.Logging;
 
 namespace SimpleSoundboard.NAudio
 {
@@ -15,6 +17,7 @@ namespace SimpleSoundboard.NAudio
 		private readonly Dictionary<int, string> mappedOutputDevices;
 		private readonly Dictionary<string, int> outputDevices;
 		private readonly int outputIndex;
+		private readonly ILogger logger;
 
 		private readonly ConcurrentDictionary<string, float>
 			volumeModifiers = new ConcurrentDictionary<string, float>();
@@ -28,11 +31,12 @@ namespace SimpleSoundboard.NAudio
 
 
 		public OutStreamController(ref Dictionary<int, string> mappedOutputDevices,
-			ref Dictionary<string, int> outputDevices, int outputIndex, float defaultVolume = 0.5f)
+			ref Dictionary<string, int> outputDevices, int outputIndex,ILogger logger, float defaultVolume = 0.5f)
 		{
 			this.mappedOutputDevices = mappedOutputDevices;
 			this.outputDevices = outputDevices;
 			this.outputIndex = outputIndex;
+			this.logger = logger;
 			externalVolume = defaultVolume;
 			tokenSource = new CancellationTokenSource();
 			token = tokenSource.Token;
@@ -66,14 +70,9 @@ namespace SimpleSoundboard.NAudio
 			}, token).ContinueWith(task =>
 			{
 				if (task.IsFaulted)
-					ThrowException(task.Exception);
+					logger.Log($"[OutStreamController(outputIndex)] PlayTask for '{audioFile}' failed!", task.Exception,LogLevels.Error);
+					
 			}, token);
-		}
-
-		private void ThrowException(Exception exception)
-		{
-			if (exception is AggregateException aggregateException) ThrowException(aggregateException.InnerException);
-			throw exception;
 		}
 
 		public void ChangeVolume(float volume)
@@ -86,7 +85,9 @@ namespace SimpleSoundboard.NAudio
 		{
 			tokenSource.Cancel();
 
-			foreach (var waveOutEvent in waveOutEvents) waveOutEvent.Value.Stop();
+			foreach (var waveOutEvent in waveOutEvents)
+				waveOutEvent.Value.Stop();
+
 			fileReaders.Clear();
 			waveOutEvents.Clear();
 			volumeModifiers.Clear();
@@ -106,7 +107,8 @@ namespace SimpleSoundboard.NAudio
 			DisposeAndRemove(waveOutEvents, id);
 			DisposeAndRemove(volumeModifiers, id);
 			DisposeAndRemove(fileReaders, id);
-			if (waveOutEvents.Count == 0)
+
+			if (waveOutEvents.Count == 0 || volumeModifiers.Count == 0 || fileReaders.Count == 0)
 			{
 				waveOutEvents.Clear();
 				volumeModifiers.Clear();

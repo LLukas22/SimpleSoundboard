@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using NAudio.Wave;
+using SimpleSoundboard.Interfaces.Logger;
 using SimpleSoundboard.Interfaces.NAudio;
+using SimpleSoundboard.NameService.Logging;
 using SimpleSoundboard.NameService.NAudio;
 
 namespace SimpleSoundboard.NAudio
@@ -10,18 +12,20 @@ namespace SimpleSoundboard.NAudio
 	public class NAudioController : INAudioController
 	{
 		private readonly Dictionary<int, string> mappedOutputDevices;
+		private readonly ILogger logger;
 		private readonly int outputChannelCount;
 		private readonly List<OutStreamController> outStreamController;
 		private Dictionary<string, int> outputDevices;
 
-		public NAudioController(int outputChannels = 2)
+		public NAudioController(ILogger logger, int outputChannels = 2)
 		{
+			this.logger = logger;
 			outputChannelCount = outputChannels;
 			GetWaveOutCapabilities();
 			mappedOutputDevices = new Dictionary<int, string>(outputChannelCount);
 			outStreamController = new List<OutStreamController>(outputChannelCount);
 			for (var i = 0; i < outputChannelCount; i++)
-				outStreamController.Add(new OutStreamController(ref mappedOutputDevices, ref outputDevices, i));
+				outStreamController.Add(new OutStreamController(ref mappedOutputDevices, ref outputDevices, i, logger));
 			outputDevices = new Dictionary<string, int>();
 		}
 
@@ -72,8 +76,17 @@ namespace SimpleSoundboard.NAudio
 
 		public INAudioController Stop(bool collectGarbage = true)
 		{
-			foreach (var controller in outStreamController ?? new List<OutStreamController>())
-				controller.Stop();
+			try
+			{
+				foreach (var controller in outStreamController ?? new List<OutStreamController>())
+					controller.Stop();
+			}
+			catch (Exception exception)
+			{
+				logger.Log("There was an error while stopping the OutStreamControllers", exception,LogLevels.Error);
+			}
+		
+
 			if (collectGarbage)
 			{
 				GC.Collect();

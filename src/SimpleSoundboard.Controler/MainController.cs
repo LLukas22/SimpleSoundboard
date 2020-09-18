@@ -10,11 +10,13 @@ using SimpleSoundboard.Extensions;
 using SimpleSoundboard.Interfaces.Controller;
 using SimpleSoundboard.Interfaces.Controller.Base;
 using SimpleSoundboard.Interfaces.Keyboard;
+using SimpleSoundboard.Interfaces.Logger;
 using SimpleSoundboard.Interfaces.Models;
 using SimpleSoundboard.Interfaces.Models.Models;
 using SimpleSoundboard.Interfaces.NAudio;
 using SimpleSoundboard.Interfaces.Root;
 using SimpleSoundboard.Interfaces.Views;
+using SimpleSoundboard.NameService.Logging;
 using SimpleSoundboard.NameService.Models;
 using SimpleSoundboard.Views.MessageBox;
 using Soundboard.Entities;
@@ -34,6 +36,7 @@ namespace SimpleSoundboard.Controller
 		[Dependency] public IKeyboardController KeyboardController { get; set; }
 		[Dependency] public IRepositoryManager RepositoryManager { get; set; }
 		[Dependency] public IControllerFactory ControllerFactory { get; set; }
+		[Dependency] public ILogger Logger { get; set; }
 		[Dependency] public MetroStyleManager StyleManager { get; set; }
 
 		public override IController<IMainView> Initialize()
@@ -76,7 +79,15 @@ namespace SimpleSoundboard.Controller
 
 		public void Save()
 		{
-			RepositoryManager.Save();
+			try
+			{
+				RepositoryManager.Save();
+			}
+			catch (Exception exception)
+			{
+				Logger.Log($"[{this.GetType().Name}] Failed Save!", exception,LogLevels.Error); 
+			}
+			
 		}
 
 		public void Play(Guid id)
@@ -101,16 +112,24 @@ namespace SimpleSoundboard.Controller
 
 		public void OpenSettings()
 		{
-			KeyboardController.Pause();
-			var settingsController = (ISettingsController) ControllerFactory.Create(typeof(ISettingsController));
-			settingsController.BindingData(activeApplicationSettings).Initialize().ShowDialogue(this);
-			SpecificView.SetStopButtonText(activeApplicationSettings.StopKeys);
-			StyleManager.Theme = activeApplicationSettings.Style.ToMetroTheme();
-			StyleManager.Style = activeApplicationSettings.AccentColor.ToMetroColor();
-			StyleManager.Update();
-			SpecificView.ApplyStyleManager();
-			SpecificView.Refresh();
-			KeyboardController.RegisterPriorityAction(activeApplicationSettings.StopKeys, Stop).Continue();
+			try
+			{
+				KeyboardController.Pause();
+				var settingsController = (ISettingsController)ControllerFactory.Create(typeof(ISettingsController));
+				settingsController.BindingData(activeApplicationSettings).Initialize().ShowDialogue(this);
+				SpecificView.SetStopButtonText(activeApplicationSettings.StopKeys);
+				StyleManager.Theme = activeApplicationSettings.Style.ToMetroTheme();
+				StyleManager.Style = activeApplicationSettings.AccentColor.ToMetroColor();
+				StyleManager.Update();
+				SpecificView.ApplyStyleManager();
+				SpecificView.Refresh();
+				KeyboardController.RegisterPriorityAction(activeApplicationSettings.StopKeys, Stop).Continue();
+			}
+			catch (Exception exception)
+			{
+				Logger.Log($"[{this.GetType().Name}] Failed OpenSettings!", exception, LogLevels.Error);
+			}
+
 		}
 
 		public void Add()
@@ -153,18 +172,33 @@ namespace SimpleSoundboard.Controller
 
 		public void UpdateKeyboardController()
 		{
-			KeyboardController.ClearKeyActions();
-			foreach (var model in RepositoryManager
-				.Get<IAudioEntryModel>(typeof(IAudioEntryModel)).GetDictionary().Values)
-				KeyboardController.RegisterKeyAction(model.KeyBinding, () => Play(model),
-					string.IsNullOrEmpty(model.KeyboardName) ? null : model.KeyboardName);
+			try
+			{
+				KeyboardController.ClearKeyActions();
+				foreach (var model in RepositoryManager
+					.Get<IAudioEntryModel>(typeof(IAudioEntryModel)).GetDictionary().Values)
+					KeyboardController.RegisterKeyAction(model.KeyBinding, () => Play(model),
+						string.IsNullOrEmpty(model.KeyboardName) ? null : model.KeyboardName);
+			}
+			catch (Exception exception)
+			{
+				Logger.Log($"[{this.GetType().Name}] Failed UpdateKeyboardController!", exception, LogLevels.Error);
+			}
 		}
 
 
 		public void UpdateDataSource()
 		{
-			SpecificView.RefreshGrid(RepositoryManager
-				.Get<IAudioEntryModel>(typeof(IAudioEntryModel)).GetDictionary().Values.ToList());
+			try
+			{
+				SpecificView.RefreshGrid(RepositoryManager
+					.Get<IAudioEntryModel>(typeof(IAudioEntryModel)).GetDictionary().Values.ToList());
+			}
+			catch (Exception exception)
+			{
+				Logger.Log($"[{this.GetType().Name}] Failed UpdateDataSource!", exception, LogLevels.Error);
+			}
+
 		}
 
 		private void Play(IAudioEntryModel model)
@@ -173,27 +207,31 @@ namespace SimpleSoundboard.Controller
 			{
 				NAudioController.Play(model.FilePath, model.Volume);
 			}
-			catch (Exception exc)
+			catch (Exception exception)
 			{
-				Task.Run(() =>
-				{
-					CustomMetroMessageBox.Show(SpecificView as Form, $"Encountered Exception: '{exc.Message}'", "Error",
-						MessageBoxButtons.OK, MessageBoxIcon.Error);
-				});
+				Logger.Log($"[{this.GetType().Name}] Failed Play!", exception, LogLevels.Error);
 			}
 		}
 
 		private void OpenAudioView(IAudioEntryModel model,bool add=true)
 		{
-			KeyboardController.Pause();
-			var audioSettingsController = (IAudioController) ControllerFactory.Create(typeof(IAudioController));
-			if (audioSettingsController.BindingData(model).Initialize().ShowDialogue(this) == DialogResult.OK)
+			try
 			{
-				if(add) RepositoryManager.Get<IAudioEntryModel>(typeof(IAudioEntryModel)).Add(model);
-				UpdateDataSource();
-				UpdateKeyboardController();
+				KeyboardController.Pause();
+				var audioSettingsController = (IAudioController) ControllerFactory.Create(typeof(IAudioController));
+				if (audioSettingsController.BindingData(model).Initialize().ShowDialogue(this) == DialogResult.OK)
+				{
+					if (add) RepositoryManager.Get<IAudioEntryModel>(typeof(IAudioEntryModel)).Add(model);
+					UpdateDataSource();
+					UpdateKeyboardController();
+				}
+
+				KeyboardController.Continue();
 			}
-			KeyboardController.Continue();
+			catch (Exception exception)
+			{
+				Logger.Log($"[{this.GetType().Name}] Failed OpenAudioView!", exception, LogLevels.Error);
+			}
 		}
 	}
 }
