@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using System.Windows.Forms;
 using MetroFramework.Components;
 using MetroFramework.Forms;
@@ -15,6 +16,8 @@ namespace SimpleSoundboard.Views.Base
 		public BaseView(MetroStyleManager styleManager)
 		{
 			this.styleManager = styleManager;
+			
+			this.Icon = SimpleSoundboard.Views.Properties.Resources.Note;
 			InitializeComponent();
 		}
 

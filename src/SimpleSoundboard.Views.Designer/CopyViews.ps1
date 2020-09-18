@@ -44,9 +44,9 @@ try {
 	}
 
 	# Resources
-	Get-ChildItem -Path ".\Properties\Resources*" -Recurse | ForEach-Object {
-		Copy-File $_.FullName $true
-	}
+	#-ChildItem -Path ".\Properties\Resources*" -Recurse | ForEach-Object {
+	#	Copy-File $_.FullName $true
+	#}
 	
 	# Extra stuff
 	$CommonDirectories | ForEach-Object {
