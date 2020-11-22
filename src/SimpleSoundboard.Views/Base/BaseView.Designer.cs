@@ -34,11 +34,12 @@
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.BorderStyle = MetroFramework.Forms.MetroFormBorderStyle.FixedSingle;
 			this.ClientSize = new System.Drawing.Size(666, 414);
 			this.MaximizeBox = false;
+			this.MinimizeBox = false;
 			this.Name = "BaseView";
 			this.Resizable = false;
+			this.ShadowType = MetroFramework.Forms.MetroFormShadowType.DropShadow;
 			this.ResumeLayout(false);
 
 		}

@@ -20,6 +20,8 @@ namespace SimpleSoundboard.Views.Views
 		public MainView(MetroStyleManager styleManager) : base(styleManager)
 		{
 			InitializeComponent();
+			//Metro form is buggy and generates this wrong 
+			this.MinimizeBox = true;
 		}
 
 		public override void ApplyStyleManager()

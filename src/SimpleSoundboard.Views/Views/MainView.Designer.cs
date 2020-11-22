@@ -77,7 +77,7 @@
 			this.metroGrid1.EnableHeadersVisualStyles = false;
 			this.metroGrid1.Font = new System.Drawing.Font("Segoe UI", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
 			this.metroGrid1.GridColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-			this.metroGrid1.Location = new System.Drawing.Point(9, 15);
+			this.metroGrid1.Location = new System.Drawing.Point(9, 23);
 			this.metroGrid1.MultiSelect = false;
 			this.metroGrid1.Name = "metroGrid1";
 			this.metroGrid1.ReadOnly = true;
@@ -93,12 +93,12 @@
 			this.metroGrid1.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
 			this.metroGrid1.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
 			this.metroGrid1.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-			this.metroGrid1.Size = new System.Drawing.Size(494, 504);
+			this.metroGrid1.Size = new System.Drawing.Size(494, 496);
 			this.metroGrid1.TabIndex = 0;
 			// 
 			// btn_Play
 			// 
-			this.btn_Play.Location = new System.Drawing.Point(509, 26);
+			this.btn_Play.Location = new System.Drawing.Point(509, 23);
 			this.btn_Play.Name = "btn_Play";
 			this.btn_Play.Size = new System.Drawing.Size(105, 45);
 			this.btn_Play.TabIndex = 1;
@@ -107,7 +107,7 @@
 			// 
 			// btn_Stop
 			// 
-			this.btn_Stop.Location = new System.Drawing.Point(509, 77);
+			this.btn_Stop.Location = new System.Drawing.Point(509, 74);
 			this.btn_Stop.Name = "btn_Stop";
 			this.btn_Stop.Size = new System.Drawing.Size(105, 45);
 			this.btn_Stop.TabIndex = 4;
@@ -136,7 +136,7 @@
 			// 
 			// btn_Add
 			// 
-			this.btn_Add.Location = new System.Drawing.Point(509, 128);
+			this.btn_Add.Location = new System.Drawing.Point(509, 125);
 			this.btn_Add.Name = "btn_Add";
 			this.btn_Add.Size = new System.Drawing.Size(105, 45);
 			this.btn_Add.TabIndex = 7;
@@ -145,7 +145,7 @@
 			// 
 			// btn_Delete
 			// 
-			this.btn_Delete.Location = new System.Drawing.Point(509, 179);
+			this.btn_Delete.Location = new System.Drawing.Point(509, 176);
 			this.btn_Delete.Name = "btn_Delete";
 			this.btn_Delete.Size = new System.Drawing.Size(105, 45);
 			this.btn_Delete.TabIndex = 8;
@@ -235,6 +235,7 @@
 			this.Controls.Add(this.metroGrid1);
 			this.Name = "MainView";
 			this.Style = MetroFramework.MetroColorStyle.Orange;
+			this.TextAlign = MetroFramework.Forms.MetroFormTextAlign.Center;
 			((System.ComponentModel.ISupportInitialize)(this.metroGrid1)).EndInit();
 			this.ResumeLayout(false);
 			this.PerformLayout();
