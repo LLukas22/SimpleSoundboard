@@ -1,11 +1,11 @@
-﻿using System;
+﻿using NAudio.Wave;
+using SimpleSoundboard.Interfaces.Logger;
+using SimpleSoundboard.NameService.Logging;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using NAudio.Wave;
-using SimpleSoundboard.Interfaces.Logger;
-using SimpleSoundboard.NameService.Logging;
 
 namespace SimpleSoundboard.NAudio
 {
@@ -31,7 +31,7 @@ namespace SimpleSoundboard.NAudio
 
 
 		public OutStreamController(ref Dictionary<int, string> mappedOutputDevices,
-			ref Dictionary<string, int> outputDevices, int outputIndex,ILogger logger, float defaultVolume = 0.5f)
+			ref Dictionary<string, int> outputDevices, int outputIndex, ILogger logger, float defaultVolume = 0.5f)
 		{
 			this.mappedOutputDevices = mappedOutputDevices;
 			this.outputDevices = outputDevices;
@@ -45,65 +45,102 @@ namespace SimpleSoundboard.NAudio
 
 		public void Play(string audioFile, float volumeModifier = 1)
 		{
-			var outputDevice = int.MinValue;
-
-
-			if (mappedOutputDevices.ContainsKey(outputIndex))
-				if (outputDevices.ContainsKey(mappedOutputDevices[outputIndex]))
-					outputDevice = outputDevices[mappedOutputDevices[outputIndex]];
-			//outputDevice is None or wasn't found
-			if (outputDevice == int.MinValue)
-				return;
-
-			var guid = Guid.NewGuid().ToString("N").Substring(0, 8);
-
-			Task.Run(() =>
+			try
 			{
-				var fileReader = new AudioFileReader(audioFile) {Volume = externalVolume * volumeModifier};
-				var waveOutEvent = new WaveOutEvent {DeviceNumber = outputDevice};
-				waveOutEvent.PlaybackStopped += (sender, e) => WaveOutEventOnPlaybackStopped(sender, e, guid);
-				waveOutEvent.Init(fileReader);
-				fileReaders.TryAdd(guid, fileReader);
-				waveOutEvents.TryAdd(guid, waveOutEvent);
-				volumeModifiers.TryAdd(guid, volumeModifier);
-				waveOutEvent.Play();
-			}, token).ContinueWith(task =>
+				var outputDevice = int.MinValue;
+
+				if (mappedOutputDevices.ContainsKey(outputIndex))
+					if (outputDevices.ContainsKey(mappedOutputDevices[outputIndex]))
+						outputDevice = outputDevices[mappedOutputDevices[outputIndex]];
+				//outputDevice is None or wasn't found
+				if (outputDevice == int.MinValue)
+					return;
+
+				var guid = Guid.NewGuid().ToString("N").Substring(0, 8);
+
+				Task.Run(() =>
+				{
+					var fileReader = new AudioFileReader(audioFile) { Volume = externalVolume * volumeModifier };
+					var waveOutEvent = new WaveOutEvent { DeviceNumber = outputDevice };
+					waveOutEvent.PlaybackStopped += (sender, e) => WaveOutEventOnPlaybackStopped(sender, e, guid);
+					waveOutEvent.Init(fileReader);
+					fileReaders.TryAdd(guid, fileReader);
+					waveOutEvents.TryAdd(guid, waveOutEvent);
+					volumeModifiers.TryAdd(guid, volumeModifier);
+					waveOutEvent.Play();
+				}, token).ContinueWith(task =>
+				{
+					if (task.IsFaulted)
+						logger.Log($"[OutStreamController(outputIndex)] PlayTask for '{audioFile}' failed!", task.Exception, LogLevels.Error);
+
+				}, token);
+			}
+			catch (Exception exception)
 			{
-				if (task.IsFaulted)
-					logger.Log($"[OutStreamController(outputIndex)] PlayTask for '{audioFile}' failed!", task.Exception,LogLevels.Error);
-					
-			}, token);
+				logger.Log($"Encountered error while trying to play {audioFile}!", exception, LogLevels.Error);
+			}
+
 		}
 
 		public void ChangeVolume(float volume)
 		{
-			externalVolume = volume;
-			foreach (var id in fileReaders.Keys) fileReaders[id].Volume = externalVolume * volumeModifiers[id];
+			try
+			{
+				externalVolume = volume;
+				foreach (var id in fileReaders.Keys) fileReaders[id].Volume = externalVolume * volumeModifiers[id];
+			}
+			catch (Exception exception)
+			{
+				logger.Log($"Encountered error while changing volume!", exception, LogLevels.Error);
+			}
+
 		}
 
 		public void Stop()
 		{
-			tokenSource.Cancel();
+			try
+			{
+				tokenSource.Cancel();
 
-			foreach (var waveOutEvent in waveOutEvents)
-				waveOutEvent.Value.Stop();
+				foreach (var waveOutEvent in waveOutEvents)
+					waveOutEvent.Value.Stop();
 
-			fileReaders.Clear();
-			waveOutEvents.Clear();
-			volumeModifiers.Clear();
+				fileReaders.Clear();
+				waveOutEvents.Clear();
+				volumeModifiers.Clear();
+			}
+			catch (Exception exception)
+			{
+				logger.Log($"Encountered error while stopping!", exception, LogLevels.Error);
+			}
+			finally
+			{
+				//create new CancellationTokenSource
+				tokenSource = new CancellationTokenSource();
+				token = tokenSource.Token;
+			}
 
-			tokenSource = new CancellationTokenSource();
-			token = tokenSource.Token;
+
 		}
 
 
 		private void WaveOutEventOnPlaybackStopped(object? sender, StoppedEventArgs e, string id)
 		{
-			RemoveViaId(id);
+			try
+			{
+				RemoveViaId(id);
+			}
+			catch (Exception exception)
+			{
+				logger.Log($"Encountered Error while clearing waveoutevent {id}!", exception, LogLevels.Error);
+			}
 		}
+
+		private readonly object balanceLock = new object();
 
 		private void RemoveViaId(string id)
 		{
+
 			DisposeAndRemove(waveOutEvents, id);
 			DisposeAndRemove(volumeModifiers, id);
 			DisposeAndRemove(fileReaders, id);
@@ -117,14 +154,19 @@ namespace SimpleSoundboard.NAudio
 				GC.Collect();
 				GC.WaitForPendingFinalizers();
 			}
+
 		}
+
 
 		private void DisposeAndRemove<TType>(ConcurrentDictionary<string, TType> dictionary, string id)
 		{
-			if (!dictionary.ContainsKey(id)) return;
-			if (dictionary[id] is IDisposable disposable)
-				disposable.Dispose();
-			dictionary.TryRemove(id, out _);
+			lock (balanceLock)
+			{
+				if (!dictionary.ContainsKey(id)) return;
+				if (dictionary[id] is IDisposable disposable)
+					disposable.Dispose();
+				dictionary.TryRemove(id, out _);
+			}
 		}
 	}
 }
