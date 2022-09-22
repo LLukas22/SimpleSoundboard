@@ -16,8 +16,6 @@ jobs:
         dotnet-version: 6.0.x
     - name: Restore dependencies
       run: dotnet restore
-    - name: Build
-      run: dotnet build --no-restore
     - name: Publish
       run: dotnet publish src/SimpleSoundboard/SimpleSoundboard.csproj -c Release -o out
     - name: Upload a Build Artifact
