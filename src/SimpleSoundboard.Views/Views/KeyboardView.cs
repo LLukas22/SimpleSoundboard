@@ -27,12 +27,15 @@ namespace SimpleSoundboard.Views.Views
 			base.Subscribe();
 		}
 
-		private void KeyboardControllerOnKeyReleased(object sender, RawInputEventArgs e)
+		private void KeyboardControllerOnKeyReleased(object sender, IKeyEventArgs e)
 		{
-			customMetroTextBox_DeviceName.Text = e.KeyPressEvent.DeviceName;
-			customMetroTextBox_DeviceType.Text = e.KeyPressEvent.DeviceType;
-			customMetroTextBox_Key.Text = e.KeyCode.ToString();
-			customMetroTextBox_Name.Text = e.KeyPressEvent.Name;
+			if(e is RawInputEventArgs rawArgs)
+			{
+                customMetroTextBox_DeviceName.Text = rawArgs.KeyPressEvent.DeviceName;
+                customMetroTextBox_DeviceType.Text = rawArgs.KeyPressEvent.DeviceType;
+                customMetroTextBox_Key.Text = rawArgs.KeyCode.ToString();
+                customMetroTextBox_Name.Text = rawArgs.KeyPressEvent.Name;
+            }
 		}
 	}
 }

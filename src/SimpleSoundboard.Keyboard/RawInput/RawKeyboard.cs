@@ -118,10 +118,6 @@ namespace SimpleSoundboard.Keyboard.RawInput
 
 		public void ProcessRawInput(IntPtr hdevice)
 		{
-			//Debug.WriteLine(_rawBuffer.data.keyboard.ToString());
-			//Debug.WriteLine(_rawBuffer.data.hid.ToString());
-			//Debug.WriteLine(_rawBuffer.header.ToString());
-
 			if (_deviceList.Count == 0) return;
 
 			var dwSize = 0;

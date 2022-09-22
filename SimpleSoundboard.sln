@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30428.66
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32901.215
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleSoundboard", "src\SimpleSoundboard\SimpleSoundboard.csproj", "{F2AFA238-89AE-432F-B975-2CB8EE740DBE}"
 EndProject
@@ -23,7 +23,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleSoundboard.NameServic
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleSoundboard.Extensions", "src\SimpleSoundboard.Extensions\SimpleSoundboard.Extensions.csproj", "{CEDEB541-031F-412E-8AD2-DD054ABFFCB4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleSoundboard.Keyboard.NameService", "src\SimpleSoundboard.Keyboard.NameService\SimpleSoundboard.Keyboard.NameService.csproj", "{DB1DDFFA-229C-494F-B3CF-AC2BC5619562}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleSoundboard.Keyboard.NameService", "src\SimpleSoundboard.Keyboard.NameService\SimpleSoundboard.Keyboard.NameService.csproj", "{DB1DDFFA-229C-494F-B3CF-AC2BC5619562}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{6CC6F16F-696D-4827-A229-8CAF3426CEC8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleSoundboard.Keyboard.Tests", "tests\SimpleSoundboard.Keyboard.Tests\SimpleSoundboard.Keyboard.Tests.csproj", "{70C4F265-7CE9-4418-BD82-FCD4D68B654E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -75,9 +79,16 @@ Global
 		{DB1DDFFA-229C-494F-B3CF-AC2BC5619562}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DB1DDFFA-229C-494F-B3CF-AC2BC5619562}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DB1DDFFA-229C-494F-B3CF-AC2BC5619562}.Release|Any CPU.Build.0 = Release|Any CPU
+		{70C4F265-7CE9-4418-BD82-FCD4D68B654E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{70C4F265-7CE9-4418-BD82-FCD4D68B654E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{70C4F265-7CE9-4418-BD82-FCD4D68B654E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{70C4F265-7CE9-4418-BD82-FCD4D68B654E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{70C4F265-7CE9-4418-BD82-FCD4D68B654E} = {6CC6F16F-696D-4827-A229-8CAF3426CEC8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {803CB7CF-65D6-489D-B930-7DAFBDEE6CD9}

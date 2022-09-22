@@ -3,8 +3,14 @@ using System.Windows.Forms;
 
 namespace SimpleSoundboard.Keyboard.NameService
 {
-	public class RawInputEventArgs : EventArgs
+	public interface IKeyEventArgs
 	{
+        public Keys KeyCode { get; }
+        public KeyState KeyState { get; }
+		string UniqueName { get; }
+	}
+	public class RawInputEventArgs : EventArgs, IKeyEventArgs
+    {
 		public RawInputEventArgs(KeyPressEvent arg)
 		{
 			KeyPressEvent = arg;
@@ -14,6 +20,7 @@ namespace SimpleSoundboard.Keyboard.NameService
 		public KeyPressEvent KeyPressEvent { get; }
 		public string Id { get; }
 		public Keys KeyCode => (Keys) KeyPressEvent.VKey;
-		public string UniqueName => $"{KeyPressEvent.Name}[{KeyPressEvent.DeviceName}]";
+        public KeyState KeyState => KeyPressEvent.KeyState;
+        public string UniqueName => $"{KeyPressEvent.Name}[{KeyPressEvent.DeviceName}]";
 	}
 }

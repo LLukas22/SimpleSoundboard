@@ -7,7 +7,7 @@ namespace SimpleSoundboard.Interfaces.Keyboard
 {
 	public interface IKeyboardController
 	{
-		delegate void KeyReleasedHandler(object sender, RawInputEventArgs e);
+		delegate void KeyReleasedHandler(object sender, IKeyEventArgs e);
 
 		void RegisterKeyAction(IEnumerable<Keys> keys, Action action, string keyboard = null);
 		IKeyboardController BindToForm(Form form, bool captureOnlyInForeground = false);

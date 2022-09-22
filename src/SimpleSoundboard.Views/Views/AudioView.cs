@@ -49,7 +49,7 @@ namespace SimpleSoundboard.Views.Views
 			return this;
 		}
 
-		private void KeyboardControllerOnKeyReleased(object sender, RawInputEventArgs e)
+		private void KeyboardControllerOnKeyReleased(object sender, IKeyEventArgs e)
 		{
 			//Clean Entity when KeyboardName is not needed
 			var oldState = clone.EntityState;

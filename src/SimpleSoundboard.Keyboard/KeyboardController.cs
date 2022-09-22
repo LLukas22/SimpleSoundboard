@@ -1,28 +1,29 @@
-﻿using System;
+﻿using SimpleSoundboard.Interfaces.Keyboard;
+using SimpleSoundboard.Keyboard.NameService;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
-using SimpleSoundboard.Interfaces.Keyboard;
-using SimpleSoundboard.Keyboard.NameService;
 
 namespace SimpleSoundboard.Keyboard
 {
 	public class KeyboardController : IKeyboardController
 	{
-		private readonly ConcurrentDictionary<string, Dictionary<List<Keys>, Action>> keyboardKeyMap;
-		private readonly List<Keys> keyBuffer;
+		private readonly Dictionary<string, Dictionary<string, Action>> keyboardKeyMap;
+        private Dictionary<string, Action> priorityActions;
+        private readonly HashSet<Keys> keyBuffer;
 		private readonly int maxCombinationLength;
-		private bool paused;
-		private (List<Keys>, Action) priorityAction;
 		private RawInput.RawInput rawInput;
+        private bool paused;
 
-		public KeyboardController(int maxCombinationLength = 3)
+        public KeyboardController(int maxCombinationLength = 3)
 		{
 			this.maxCombinationLength = maxCombinationLength;
-			keyboardKeyMap = new ConcurrentDictionary<string, Dictionary<List<Keys>, Action>>();
-			keyBuffer = new List<Keys>(maxCombinationLength);
-		}
+			keyboardKeyMap = new();
+			keyBuffer = new(maxCombinationLength);
+			priorityActions = new();
+        }
 
 		public void Pause()
 		{
@@ -36,9 +37,14 @@ namespace SimpleSoundboard.Keyboard
 			paused = false;
 		}
 
+		private string KeysToString(IEnumerable<Keys> keys)
+		{
+			return string.Join(" ", keys.Select(k => k.ToString()).ToArray());
+        }
+
 		public IKeyboardController RegisterPriorityAction(IEnumerable<Keys> keys, Action action)
 		{
-			priorityAction = (keys.ToList(), action);
+			priorityActions.Add(KeysToString(keys),action);
 			return this;
 		}
 
@@ -49,82 +55,87 @@ namespace SimpleSoundboard.Keyboard
 
 		public void RegisterKeyAction(IEnumerable<Keys> keys, Action action, string keyboard = null)
 		{
-			var enumerable = keys as List<Keys> ?? keys.ToList();
+			var enumerable = keys.ToList();
 			if (enumerable.Count > maxCombinationLength || enumerable.Count == 0)
 				throw new ArgumentException();
+
 			if (string.IsNullOrEmpty(keyboard))
 				keyboard = KeyboardConstants.DefaultKeyboard;
 
 			if (keyboardKeyMap.ContainsKey(keyboard))
 			{
-				if (keyboardKeyMap[keyboard].ContainsKey(enumerable))
+				if (keyboardKeyMap[keyboard].ContainsKey(KeysToString(keys)))
 					throw new ArgumentException($"There is already an Action registered on {enumerable}");
-				keyboardKeyMap[keyboard].TryAdd(enumerable, action);
+				keyboardKeyMap[keyboard].Add(KeysToString(keys), action);
 			}
 			else
 			{
-				keyboardKeyMap.TryAdd(keyboard,
-					new Dictionary<List<Keys>, Action>(new KeysEqualityComparer()) {{enumerable, action}});
+				keyboardKeyMap.Add(keyboard, new() { { KeysToString(keys), action } });
 			}
 		}
 
 		public IKeyboardController BindToForm(Form form, bool captureOnlyInForeground = false)
 		{
 			rawInput = new RawInput.RawInput(form.Handle, captureOnlyInForeground);
-			rawInput.KeyPressed += delegate(object sender, RawInputEventArgs rawInputEventArg)
-			{
-				switch (rawInputEventArg?.KeyPressEvent?.KeyState)
-				{
-					case KeyState.Pressed:
-						KeyPressed(rawInputEventArg);
-						break;
-					case KeyState.Released:
-						KeyReleased(rawInputEventArg);
-						break;
-				}
-			};
-			return this;
+			rawInput.KeyPressed += OnKeyEvent;
+            return this;
 		}
+
+		public void OnKeyEvent(object sender, IKeyEventArgs rawInputEventArg)
+		{
+            switch (rawInputEventArg?.KeyState)
+            {
+                case KeyState.Pressed:
+                    KeyPressed(rawInputEventArg);
+                    break;
+                case KeyState.Released:
+                    KeyReleased(rawInputEventArg);
+                    break;
+            }
+        }
 
 		private void MatchKeys(string keyboardName)
 		{
-			var keysToMatch = keyBuffer.ToList();
+			var combination = KeysToString(keyBuffer);
 			if (keyboardKeyMap.ContainsKey(keyboardName))
-				if (keyboardKeyMap[keyboardName].ContainsKey(keysToMatch))
-				{
-					keyboardKeyMap[keyboardName][keysToMatch].Invoke();
-					return;
-				}
-
-			if (keyboardKeyMap.ContainsKey(KeyboardConstants.DefaultKeyboard))
-				if (keyboardKeyMap[KeyboardConstants.DefaultKeyboard].ContainsKey(keysToMatch))
-					keyboardKeyMap[KeyboardConstants.DefaultKeyboard][keysToMatch].Invoke();
+			{
+                if (keyboardKeyMap[keyboardName].ContainsKey(combination))
+                {
+                    keyboardKeyMap[keyboardName][combination].Invoke();
+                }
+            }
 		}
 
 		private bool MatchPriorityKeys()
 		{
-			if (priorityAction.Item1.In(keyBuffer.ToList()))
+			var combination = KeysToString(keyBuffer);
+			if (priorityActions.ContainsKey(combination))
 			{
-				priorityAction.Item2.Invoke();
-				return false;
+				priorityActions[combination].Invoke();
+                return true;
 			}
-
-			return true;
+			return false;
 		}
 
-		private void KeyReleased(RawInputEventArgs rawInputEventArgs)
+		private void KeyReleased(IKeyEventArgs rawInputEventArgs)
 		{
 			OnKeyReleased?.Invoke(this, rawInputEventArgs);
 			if (!paused)
-				if (MatchPriorityKeys())
-					MatchKeys(rawInputEventArgs.UniqueName);
-			if (keyBuffer.Any(x => x == rawInputEventArgs.KeyCode))
+			{
+                if (!MatchPriorityKeys())
+                {
+                    MatchKeys(rawInputEventArgs.UniqueName);
+                    MatchKeys(KeyboardConstants.DefaultKeyboard);
+                }
+            }
+			
+            if (keyBuffer.Contains(rawInputEventArgs.KeyCode))
 				keyBuffer.Remove(rawInputEventArgs.KeyCode);
 		}
 
-		private void KeyPressed(RawInputEventArgs rawInputEventArgs)
+		private void KeyPressed(IKeyEventArgs rawInputEventArgs)
 		{
-			if (keyBuffer.Count < maxCombinationLength && keyBuffer.All(x => x != rawInputEventArgs.KeyCode))
+			if (keyBuffer.Count < maxCombinationLength)
 				keyBuffer.Add(rawInputEventArgs.KeyCode);
 		}
 	}
