@@ -22,5 +22,5 @@ jobs:
       uses: actions/upload-artifact@v2.2.2
       with:
         name: SimpleSoundboard
-        path: src/SimpleSoundboard/out/**
+        path: SimpleSoundboard/out/**
         if-no-files-found: error
