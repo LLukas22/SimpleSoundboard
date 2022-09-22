@@ -1,14 +1,11 @@
 name: .NET
 
-on:
-  push:
-    branches: [ "master" ]
-  pull_request:
-    branches: [ "master" ]
+on: 
+  workflow_dispatch:
 
 jobs:
   build:
-
+  
     runs-on: ubuntu-latest
 
     steps:
@@ -21,5 +18,11 @@ jobs:
       run: dotnet restore
     - name: Build
       run: dotnet build --no-restore
-    - name: Test
-      run: dotnet test --no-build --verbosity normal
+    - name: Publish
+      run: dotnet publish src/SimpleSoundboard/SimpleSoundboard.csproj -c Release -o out
+    - name: Upload a Build Artifact
+      uses: actions/upload-artifact@v2.2.2
+      with:
+        name: SimpleSoundboard
+        path: src/SimpleSoundboard/out/**
+        if-no-files-found: error
