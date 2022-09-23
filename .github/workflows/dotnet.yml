@@ -10,14 +10,24 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+    
+    - id: get_version
+      uses: battila7/get-version-action@v2
+      
+    - name: print version
+      run: echo ${{ steps.get_version.outputs.version-without-v }}
+      
     - name: Setup .NET
       uses: actions/setup-dotnet@v2
       with:
         dotnet-version: 6.0.x
+        
     - name: Restore dependencies
       run: dotnet restore
+      
     - name: Publish
-      run: dotnet publish src/SimpleSoundboard/SimpleSoundboard.csproj -c Release -o out
+      run: dotnet publish src/SimpleSoundboard/SimpleSoundboard.csproj -c Release -p:PublishSingleFile=true p:Version=${{steps.get_version.outputs.version-without-v}} --self-contained true -o out
+      
     - name: Upload a Build Artifact
       uses: actions/upload-artifact@v2.2.2
       with:
