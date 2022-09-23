@@ -1,0 +1,36 @@
+name: Release Build
+
+on:   
+  release:
+    types: [published]
+
+jobs:
+  build:
+  
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - id: get_version
+      uses: battila7/get-version-action@v2
+      
+    - name: print version
+      run: echo ${{ steps.get_version.outputs.version-without-v }}
+      
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v2
+      with:
+        dotnet-version: 6.0.x
+        
+    - name: Restore dependencies
+      run: dotnet restore
+      
+    - name: Publish
+      run: dotnet publish src/SimpleSoundboard/SimpleSoundboard.csproj -r win-x64 -c Release -p:PublishSingleFile=true -p:Version=${{steps.get_version.outputs.version-without-v}} --self-contained true -o out
+      
+    - name: Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: D:/a/SimpleSoundboard/SimpleSoundboard/out/SimpleSoundboard.exe
