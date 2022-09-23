@@ -1,4 +1,4 @@
-name: .NET
+name: Test Build
 
 on: 
   workflow_dispatch:
@@ -26,7 +26,7 @@ jobs:
       run: dotnet restore
       
     - name: Publish
-      run: dotnet publish src/SimpleSoundboard/SimpleSoundboard.csproj -r win-x64 -c Release -p:PublishSingleFile=true p:Version=${{steps.get_version.outputs.version-without-v}} --self-contained true -o out
+      run: dotnet publish src/SimpleSoundboard/SimpleSoundboard.csproj -r win-x64 -c Release -p:PublishSingleFile=true -p:Version=${{steps.get_version.outputs.version-without-v}} --self-contained true -o out
       
     - name: Upload a Build Artifact
       uses: actions/upload-artifact@v2.2.2
